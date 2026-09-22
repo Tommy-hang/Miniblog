@@ -174,6 +174,15 @@ Core V1 没有搜索、评论、CMS、登录、数据库、Analytics、手动主
 
 MiniBlog 既是一个可以直接写作的博客，也是一个可以逐文件理解的现代 Web 学习项目。未来每一次扩展仍会回到三个问题：它是否真正改善体验？能否用更简单的方法实现？简化以后，是否依然漂亮、舒服并且完整？
 
+## 开源许可与作者
+
+MiniBlog 由 **张文曜（Tommy-hang）** 创建并维护。为了区分软件复用与内容传播，仓库采用双层许可：
+
+- 程序代码、组件、样式和配置使用 [MIT License](LICENSE)。你可以自由使用、修改、分发和用于商业项目，但必须保留原版权与许可声明。
+- 原创文章、说明文字和视觉内容使用 [CC BY 4.0](LICENSE-CONTENT.md)。你可以分享和改编，包括商业用途，但必须署名、提供许可证链接，并说明是否做过修改。
+
+第三方内容若另有版权或许可声明，以其各自声明为准。
+
 ---
 
 <a id="english-version"></a>
@@ -321,6 +330,15 @@ Read the source in this order:
 Core V1 does not include search, comments, a CMS, authentication, a database, analytics, a manual theme switcher, projects, or a complex tag system. These features are not forbidden; they simply have not earned their complexity yet.
 
 MiniBlog believes that excellent engineering does not make complexity impressive—it makes complexity disappear behind a thoughtful experience.
+
+## License and author
+
+MiniBlog is created and maintained by **张文曜 (Tommy-hang)**. The repository uses two licenses so that software reuse and editorial reuse remain unambiguous:
+
+- Source code, components, styles, and configuration are available under the [MIT License](LICENSE). You may use, modify, distribute, and use them commercially as long as the copyright and license notice are preserved.
+- Original articles, written copy, and visual content are available under [CC BY 4.0](LICENSE-CONTENT.md). You may share and adapt them, including commercially, with appropriate credit, a license link, and an indication of changes.
+
+Third-party material remains subject to its own copyright and license notices.
 
 ---
 
