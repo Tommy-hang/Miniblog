@@ -167,6 +167,36 @@ V1.3 不引入数学公式渲染（避免为它引入 runtime 依赖）。列为
 
 ---
 
+# 0.7 Discovery & Archive
+
+> V1.4 建立。内容规模增长后，信息架构的约束。
+
+## 两个轴
+
+```text
+Time  →  Writing 的第一轴（年 → 月）
+Tag   →  第二轴（主题 / 兴趣）
+```
+
+足够。不做第三维（Popularity / Recommended / Random）。Search 有意推迟。
+
+## 原则
+
+- **Writing 就是 Archive**。不新建 `/archive/`；`/writing/` 自己按时间归档。
+- **时间来自真实数据**。年 / 月分组由 frontmatter `date` 生成，不手写。排序 `date DESC`，并以 title / id 做稳定的次级排序，避免 build 顺序造成随机。
+- **Archive 忽略 featured**。featured 只影响首页；Archive 永远以真实时间为主，`updated` 不改变位置。
+- **标签是受控词表**。标签在 `src/lib/tags.ts` 注册，并由 content schema 校验；拼错在构建期直接失败，不生成错误路由。标签固定英文，跨 Writing / Projects 共享。
+- **标签是知识导航，不是 SEO 关键词**。一篇内容通常 1–3 个标签。
+- **Tag 路由统一** `/tags/<slug>/`。一个 Tag 页面可同时展示 Writing 与 Projects，分区显示，空 section 不显示。
+- **Global navigation 不变**。Header 永远只有 Writing / Projects / About；Discovery 发生在内容结构内部，不向全局导航加入口。
+- **Static-first**：分组、计数、Tag 路由全部 build-time；0 客户端 JS，无运行时 filter。
+
+## 明确不做
+
+Search、Pagination、客户端 filter、Category、Topic、Series、Related posts、Previous / Next、TOC。只有在真实内容规模证明必要时再评估。
+
+---
+
 # 1. MiniBlog 是什么
 
 MiniBlog 是一个面向个人创作者、技术学习者和长期写作者的现代个人博客。

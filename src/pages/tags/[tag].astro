@@ -1,0 +1,55 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ArticleList from "../../components/ArticleList.astro";
+import ProjectList from "../../components/ProjectList.astro";
+import { allProjects, allWriting } from "../../lib/content";
+import { tags, type Tag } from "../../lib/tags";
+
+export async function getStaticPaths() {
+  const writing = await allWriting();
+  const projects = await allProjects();
+  const used = new Set([...writing, ...projects].flatMap((entry) => entry.data.tags));
+  return tags
+    .filter((tag) => used.has(tag.name))
+    .map((tag) => ({ params: { tag: tag.slug }, props: { tag } }));
+}
+
+interface Props {
+  tag: Tag;
+}
+
+const { tag } = Astro.props;
+const writing = (await allWriting()).filter((entry) => entry.data.tags.includes(tag.name));
+const projects = (await allProjects()).filter((entry) => entry.data.tags.includes(tag.name));
+const count = String(writing.length + projects.length).padStart(2, "0");
+---
+
+<BaseLayout
+  locale="en"
+  title={tag.name}
+  description={`Writing and projects filed under ${tag.name}.`}
+>
+  <header class="page-header">
+    <p class="index-label">Tag · {count} items</p>
+    <h1>{tag.name}</h1>
+    <p>Writing and projects filed under this topic.</p>
+  </header>
+  <div class="tag-sections">
+    {
+      writing.length > 0 && (
+        <section class="tag-section" aria-labelledby="tag-writing">
+          <h2 id="tag-writing">Writing</h2>
+          <ArticleList posts={writing} />
+        </section>
+      )
+    }
+    {
+      projects.length > 0 && (
+        <section class="tag-section" aria-labelledby="tag-projects">
+          <h2 id="tag-projects">Projects</h2>
+          <ProjectList projects={projects} />
+        </section>
+      )
+    }
+  </div>
+</BaseLayout>

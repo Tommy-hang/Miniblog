@@ -4,6 +4,7 @@ description: "Complexity is a cost. Spend it only where people can feel the retu
 date: 2026-09-16
 tags:
   - Engineering
+  - Design
 ---
 
 Small systems are not systems with fewer ambitions. They are systems where every moving part can explain why it exists.

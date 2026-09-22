@@ -1,0 +1,30 @@
+---
+import { tagSlug } from "../lib/tags";
+
+interface Props {
+  tags: string[];
+  /** Shown as plain text when the entry has no tags (e.g. "Essay"). */
+  fallback?: string;
+}
+
+const { tags, fallback } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const links = tags
+  .map((name) => ({ name, slug: tagSlug(name) }))
+  .filter((tag): tag is { name: string; slug: string } => Boolean(tag.slug));
+---
+
+{
+  links.length > 0 ? (
+    <span class="tag-links">
+      {links.map((tag, index) => (
+        <Fragment>
+          {index > 0 && <span class="tag-sep" aria-hidden="true"> / </span>}
+          <a href={`${base}tags/${tag.slug}/`}>{tag.name}</a>
+        </Fragment>
+      ))}
+    </span>
+  ) : fallback ? (
+    <span>{fallback}</span>
+  ) : null
+}

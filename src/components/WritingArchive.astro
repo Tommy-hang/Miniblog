@@ -1,0 +1,30 @@
+---
+import ArticleRow from "./ArticleRow.astro";
+import { formatDay, type WritingYearGroup } from "../lib/content";
+
+interface Props {
+  groups: WritingYearGroup[];
+}
+
+const { groups } = Astro.props;
+---
+
+<div class="archive">
+  {
+    groups.map((group) => (
+      <section class="archive-year" aria-labelledby={`year-${group.year}`}>
+        <h2 id={`year-${group.year}`}>{group.year}</h2>
+        {group.months.map((month) => (
+          <div class="archive-month">
+            <h3>{month.month}</h3>
+            <ol class="article-list">
+              {month.entries.map((post) => (
+                <ArticleRow entry={post} kind="writing" leading={formatDay(post.data.date)} />
+              ))}
+            </ol>
+          </div>
+        ))}
+      </section>
+    ))
+  }
+</div>

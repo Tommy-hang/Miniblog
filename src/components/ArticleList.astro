@@ -1,36 +1,21 @@
 ---
-import { contentStrings, contentLanguageLabel } from "../i18n/ui";
-import { formatIndexDate, localeOf, slugOf, type WritingEntry } from "../lib/content";
+import ArticleRow from "./ArticleRow.astro";
+import { formatIndexDate, type WritingEntry } from "../lib/content";
 
 interface Props {
   posts: WritingEntry[];
 }
 
 const { posts } = Astro.props;
-const base = import.meta.env.BASE_URL;
-
-const hrefFor = (post: WritingEntry) =>
-  `${base}${localeOf(post) === "en" ? "en/" : ""}writing/${slugOf(post)}/`;
 ---
 
 <ol class="article-list">
-  {posts.map((post, index) => {
-    const locale = localeOf(post);
-    return (
-      <li>
-        <a href={hrefFor(post)}>
-          <span class="article-number" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
-          <span class="article-copy" lang={locale === "zh" ? "zh-CN" : undefined}>
-            <strong>{post.data.title}</strong>
-            <span>{post.data.description}</span>
-          </span>
-          <span class="article-meta">
-            <span>{post.data.tags[0] ?? contentStrings(locale).essay}</span>
-            <span>{formatIndexDate(post.data.date)} · {contentLanguageLabel[locale]}</span>
-          </span>
-          <span class="article-arrow" aria-hidden="true">↗</span>
-        </a>
-      </li>
-    );
-  })}
+  {posts.map((post, index) => (
+    <ArticleRow
+      entry={post}
+      kind="writing"
+      leading={String(index + 1).padStart(2, "0")}
+      metaDate={formatIndexDate(post.data.date)}
+    />
+  ))}
 </ol>

@@ -1,5 +1,6 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 import type { Locale } from "../i18n/ui";
+import { tags } from "./tags";
 
 export type WritingEntry = CollectionEntry<"writing">;
 export type ProjectEntry = CollectionEntry<"projects">;
@@ -20,8 +21,14 @@ export function slugOf(entry: ContentEntry): string {
   return withoutLocale.replace(/\/index$/, "");
 }
 
+/**
+ * Newest first. Ties fall back to title, then content id, so the archive
+ * order is deterministic no matter what order the loader returns entries in.
+ */
 const byDateDesc = <T extends ContentEntry>(a: T, b: T) =>
-  b.data.date.valueOf() - a.data.date.valueOf();
+  b.data.date.valueOf() - a.data.date.valueOf() ||
+  a.data.title.localeCompare(b.data.title) ||
+  a.id.localeCompare(b.id);
 
 /**
  * Drafts are hidden in production but stay previewable in `npm run dev`.
@@ -119,4 +126,51 @@ export function formatIndexDate(date: Date): string {
 
 export function formatYear(date: Date): string {
   return new Intl.DateTimeFormat("en", { year: "numeric" }).format(date);
+}
+
+/** "22" — the day shown in the archive's leading column. */
+export function formatDay(date: Date): string {
+  return new Intl.DateTimeFormat("en", { day: "2-digit" }).format(date);
+}
+
+/** "SEP" — the English month label used as an archive heading. */
+export function formatMonthShort(date: Date): string {
+  return new Intl.DateTimeFormat("en", { month: "short" }).format(date).toUpperCase();
+}
+
+export interface WritingMonthGroup {
+  month: string;
+  entries: WritingEntry[];
+}
+
+export interface WritingYearGroup {
+  year: string;
+  months: WritingMonthGroup[];
+}
+
+/**
+ * Groups an already-sorted list of writing into year → month → entries.
+ * Insertion order follows the input (newest first), so years and months come
+ * out in descending order without any extra sorting.
+ */
+export function groupWritingByYear(entries: WritingEntry[]): WritingYearGroup[] {
+  const years = new Map<string, Map<string, WritingEntry[]>>();
+  for (const entry of entries) {
+    const year = formatYear(entry.data.date);
+    const month = formatMonthShort(entry.data.date);
+    if (!years.has(year)) years.set(year, new Map());
+    const months = years.get(year)!;
+    if (!months.has(month)) months.set(month, []);
+    months.get(month)!.push(entry);
+  }
+  return [...years].map(([year, months]) => ({
+    year,
+    months: [...months].map(([month, entries]) => ({ month, entries })),
+  }));
+}
+
+/** Registry-ordered tag names that at least one entry actually uses. */
+export function tagsInUse(entries: ContentEntry[]): string[] {
+  const used = new Set(entries.flatMap((entry) => entry.data.tags));
+  return tags.filter((tag) => used.has(tag.name)).map((tag) => tag.name);
 }

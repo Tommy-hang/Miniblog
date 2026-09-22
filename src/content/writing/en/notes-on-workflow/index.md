@@ -3,7 +3,7 @@ title: "Notes on Workflow"
 description: "A good process protects attention without becoming the work itself."
 date: 2026-09-08
 tags:
-  - Practice
+  - Workflow
 ---
 
 The best workflows are almost invisible. They create enough structure to keep work moving, then get out of the way.

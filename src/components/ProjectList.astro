@@ -1,50 +1,22 @@
 ---
-import { contentLanguageLabel } from "../i18n/ui";
-import { formatYear, localeOf, slugOf, type ProjectEntry } from "../lib/content";
+import ArticleRow from "./ArticleRow.astro";
+import { formatYear, type ProjectEntry } from "../lib/content";
 
 interface Props {
   projects: ProjectEntry[];
 }
 
 const { projects } = Astro.props;
-const base = import.meta.env.BASE_URL;
-
-const hrefFor = (project: ProjectEntry) =>
-  `${base}${localeOf(project) === "en" ? "en/" : ""}projects/${slugOf(project)}/`;
 ---
 
 <ol class="project-list">
-  {projects.map((project, index) => {
-    const locale = localeOf(project);
-    return (
-      <li>
-        <a href={hrefFor(project)}>
-          <span class="article-number" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
-          <span class="article-copy" lang={locale === "zh" ? "zh-CN" : undefined}>
-            <strong>{project.data.title}</strong>
-            <span>{project.data.description}</span>
-          </span>
-          <span class="article-meta">
-            <span>
-              {project.data.tags.join(" / ")}
-              {project.data.status ? ` · ${project.data.status}` : ""}
-            </span>
-            <span>{formatYear(project.data.date)} · {contentLanguageLabel[locale]}</span>
-          </span>
-          <span class="article-arrow" aria-hidden="true">↗</span>
-          {project.data.cover && (
-            <img
-              class="project-preview"
-              src={project.data.cover.src}
-              alt=""
-              width={project.data.cover.width}
-              height={project.data.cover.height}
-              loading="lazy"
-              aria-hidden="true"
-            />
-          )}
-        </a>
-      </li>
-    );
-  })}
+  {projects.map((project, index) => (
+    <ArticleRow
+      entry={project}
+      kind="projects"
+      leading={String(index + 1).padStart(2, "0")}
+      metaDate={formatYear(project.data.date)}
+      preview
+    />
+  ))}
 </ol>

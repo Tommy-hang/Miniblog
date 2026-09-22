@@ -6,7 +6,7 @@
 
 MiniBlog 是一个使用 Astro 构建的现代个人出版物，也是一次关于“优秀体验究竟需要多少复杂度”的长期实验。
 
-V1 建立了视觉与工程基础，V1.1 建立了内容基础，V1.2 清理了语言模型与复杂度。**V1.3 — Editorial Prose & Media** 只专注一件事：让文章本身值得认真坐下来阅读。
+V1 建立了视觉与工程基础，V1.1 建立了内容基础，V1.2 清理了语言模型与复杂度，V1.3 让文章本身值得认真坐下来阅读。**V1.4 — Discovery & Archive** 解决下一件事：当内容越来越多，人是否还能理解这里有什么，并找到感兴趣的部分。
 
 ```text
 Code defines the publishing system.
@@ -45,8 +45,13 @@ LOCAL MEDIA            Markdown + images
 STATIC SYSTEM          Astro
 ```
 
-## V1.3 包含什么
+## V1.4 包含什么
 
+- **Writing 本身就是 Archive**：`/writing/` 自动按 **年 → 月** 分组，由真实 `date` 生成，新增文章自动进入正确的年份与月份
+- **时间是第一发现轴**：Archive 永远按发布日期排序，`featured` 只影响首页
+- **标签是第二发现轴**：`tags` 变成真正可点击的导航，汇聚成 `/tags/<tag>/` 页面
+- **受控标签词表**：标签在 `src/lib/tags.ts` 注册，拼错会在构建期直接报错，不会静默生成 `/tags/contorl/`
+- **跨内容类型**：同一个标签页可以同时展示 Writing 与 Projects
 - **Editorial Prose System**：一套共享的阅读排版系统，Writing 与 Projects 复用同一套正文
 - **三层宽度**：阅读列（`--measure-reading`）、宽媒体（`--measure-wide`）、封面（`--measure-hero`）
 - **真正的阅读节奏**：段落之间紧凑，章节、图片与分隔线之间留出呼吸
@@ -213,6 +218,25 @@ demo: https://...              # 可选
 
 ---
 
+## 标签与归档
+
+Writing 归档会自动按 **年 → 月** 分组，全部来自 frontmatter 的 `date`，不需要改任何代码。你只需要给文章加标签：
+
+```yaml
+tags:
+  - AI
+  - Design
+```
+
+- 标签是**受控词表**，只能使用 `src/lib/tags.ts` 里注册过的名字。写错（例如 `Contorl`）会在 `npm run build` 时直接报错，而不是生成一个错误的 `/tags/contorl/`。
+- 想新增一个标签，就在 `src/lib/tags.ts` 里加一行 `{ name: "Control", slug: "control" }`，之后内容就可以使用它。slug 一旦发布应保持稳定。
+- 标签是跨内容类型的：同一篇文章和项目使用同一个标签，它们会出现在同一个 `/tags/<slug>/` 页面里。
+- 一篇文章通常使用 **1–3 个** 标签。标签用于导航主题，不是 SEO 关键词。
+
+Writing 页顶部的 `ALL / AI / DESIGN / …` 导航，以及每个 `/tags/<tag>/` 页面，都会根据真实内容自动生成；没有内容使用的标签不会生成页面。
+
+---
+
 ## 修改身份与设计
 
 - `src/site.ts` — 博客名称、作者、GitHub、所在地，以及首页 `Currently`（作者自己的话，可以用中文）。
@@ -226,14 +250,15 @@ demo: https://...              # 可选
 ```text
 public/                     静态品牌资产
 src/
-├── components/             Header、Footer、ArticleList、ProjectList
+├── components/             Header、Footer、ArticleRow、ArticleList、ProjectList、WritingArchive、TagLinks
 ├── content/
 │   ├── writing/            zh/ 与 en/ 下的文章 Content Bundle
 │   └── projects/           zh/ 与 en/ 下的项目 Content Bundle
 ├── i18n/ui.ts              仅内容级文案 + 语言类型
-├── lib/content.ts          locale/slug/过滤/排序/阅读时间/翻译匹配
+├── lib/content.ts          locale/slug/过滤/排序/阅读时间/翻译匹配/年-月分组
+├── lib/tags.ts             受控标签词表（name + slug）
 ├── layouts/                BaseLayout 与 ArticleLayout（文章和项目共用）
-├── pages/                  单一品牌页面 + 语言前缀的内容详情页、RSS、重定向
+├── pages/                  品牌页面 + 语言前缀内容页 + /tags/<tag>/ + RSS + 重定向
 ├── styles/global.css       站点外观（tokens、布局、导航、首页、页脚）
 ├── styles/prose.css        Editorial Prose System（文章阅读与 Markdown 排版）
 ├── content.config.ts       writing / projects 两个 Collection 的 Schema
@@ -253,6 +278,7 @@ astro.config.mjs            构建、部署路径、Sitemap 过滤
 /projects/<slug>/        中文项目
 /en/projects/<slug>/     English project
 /about/                  About（英文界面 + 中文正文）
+/tags/<tag>/             标签页（自动生成，可同时含 Writing 与 Projects）
 /rss.xml                 中文 RSS
 /en/rss.xml              English RSS
 /en/  /en/about/  /en/writing/  /en/projects/
@@ -261,14 +287,15 @@ astro.config.mjs            构建、部署路径、Sitemap 过滤
 
 ## 推荐阅读顺序
 
-1. `src/content.config.ts` — 内容模型如何定义
-2. `src/lib/content.ts` — 目录如何变成 locale、slug、阅读时间，draft 如何过滤
-3. `src/i18n/ui.ts` — 为什么只有内容级文案需要语言
-4. `src/pages/writing/[slug].astro` — 内容如何变成页面
-5. `src/layouts/ArticleLayout.astro` — 文章与项目如何共享一个版式
-6. `src/styles/prose.css` — Editorial Prose System（文章阅读与 Markdown 排版）
-7. `src/pages/rss.xml.ts` — 同一份内容如何成为 RSS
-8. `astro.config.mjs` — 构建与部署需要多少配置
+1. `src/content.config.ts` — 内容模型如何定义，标签如何在 schema 里被约束
+2. `src/lib/content.ts` — 目录如何变成 locale、slug、阅读时间，以及年-月分组
+3. `src/lib/tags.ts` — 受控标签词表
+4. `src/i18n/ui.ts` — 为什么只有内容级文案需要语言
+5. `src/pages/writing/index.astro` — Writing 如何成为按时间归档的 Archive
+6. `src/pages/tags/[tag].astro` — 标签页如何自动生成
+7. `src/layouts/ArticleLayout.astro` — 文章与项目如何共享一个版式
+8. `src/styles/prose.css` — Editorial Prose System（文章阅读与 Markdown 排版）
+9. `astro.config.mjs` — 构建与部署需要多少配置
 
 ## 部署到 GitHub Pages
 
@@ -282,9 +309,9 @@ astro.config.mjs            构建、部署路径、Sitemap 过滤
 
 ## 刻意没有实现什么
 
-V1.3 没有搜索、评论、CMS、登录、数据库、Analytics、AI 助手、标签页、Series、相关文章算法、摄影画廊、Lightbox、前端框架、Tailwind、动画库或客户端语法高亮。中文与英文都使用高质量系统字体栈，没有引入任何 Web Font。
+V1.4 没有搜索、评论、CMS、登录、数据库、Analytics、AI 助手、Series、相关文章算法、摄影画廊、Lightbox、前端框架、Tailwind、动画库或客户端语法高亮。中文与英文都使用高质量系统字体栈，没有引入任何 Web Font。
 
-这不意味着这些功能永远不应该存在。它意味着在真实需求出现之前，不提前支付它们的复杂度成本。
+**搜索是有意推迟的**：当前规模下，年 / 月时间轴加上标签已经足够找到内容；只有当 Archive 真的难以浏览时，搜索才值得它的复杂度。Series、上一篇 / 下一篇、相关文章、目录也出于同样理由推迟。
 
 ## 开源许可与作者
 
@@ -307,7 +334,7 @@ MiniBlog is a modern personal publication built with Astro and a long-term exper
 
 > **How little technical complexity does an excellent digital reading experience actually require?**
 
-V1 built the visual and engineering foundation, V1.1 built the content foundation, V1.2 cleaned up the language model and the complexity. **V1.3 — Editorial Prose & Media** focuses on one thing: making the article itself worth sitting down to read.
+V1 built the visual and engineering foundation, V1.1 the content foundation, V1.2 cleaned up the language model, V1.3 made the article worth sitting down to read. **V1.4 — Discovery & Archive** answers the next question: as content grows, can a reader still understand what is here and find what interests them?
 
 ## Brand Language ≠ Content Language
 
@@ -321,8 +348,13 @@ This is the central idea of V1.2, and a constraint for every future version.
 
 So MiniBlog is not two mirrored sites. It is one publication with an English editorial shell and multilingual content.
 
-## What V1.3 includes
+## What V1.4 includes
 
+- **Writing is the archive**: `/writing/` groups itself by **year → month**, generated from the real `date` — new articles land in the right place with no code changes
+- **Time is the first discovery axis**: the archive is always ordered by publication date; `featured` only affects the homepage
+- **Tags are the second axis**: tags become real navigation that gathers into `/tags/<tag>/` pages
+- **A controlled vocabulary**: tags are registered in `src/lib/tags.ts`, so a typo fails the build instead of silently creating `/tags/contorl/`
+- **Cross-content discovery**: a single tag page can show both Writing and Projects
 - **Editorial Prose System**: one shared reading system, reused by both Writing and Projects
 - **Three structural widths**: reading (`--measure-reading`), wide media (`--measure-wide`), and cover (`--measure-hero`)
 - **Real reading rhythm**: paragraphs stay tight, while chapters, media, and rules get breathing room
@@ -397,6 +429,23 @@ A few small conventions unlock richer presentation when you need it:
 
 `wide` / `frame` are just keywords in the image title and can be combined freely. Articles that never use them are already beautiful.
 
+## Tags and the archive
+
+The Writing archive groups itself by **year → month**, entirely from the frontmatter `date`, with no code changes. All you do is tag your content:
+
+```yaml
+tags:
+  - AI
+  - Design
+```
+
+- Tags are a **controlled vocabulary**: only names registered in `src/lib/tags.ts` are allowed. A typo (e.g. `Contorl`) fails `npm run build` instead of silently creating `/tags/contorl/`.
+- To add a tag, add one line to `src/lib/tags.ts` — `{ name: "Control", slug: "control" }` — and content can use it. Once published, a slug should stay stable.
+- Tags cross content types: the same tag on a writing piece and a project brings them together on one `/tags/<slug>/` page.
+- Use **1–3 tags** per piece. Tags navigate topics; they are not SEO keywords.
+
+The `ALL / AI / DESIGN / …` navigation on the Writing page and every `/tags/<tag>/` page are generated from real content; a tag with no published content produces no page.
+
 ## Customize and deploy
 
 - `src/site.ts` — publication identity and the homepage `Currently` list (in any content language).
@@ -408,9 +457,9 @@ To deploy, open **Settings → Pages**, choose **GitHub Actions**, and push to `
 
 ## What is intentionally absent
 
-No search, comments, CMS, authentication, database, analytics, AI assistant, tag pages, series, related-post algorithms, photography gallery, lightbox, client framework, Tailwind, or animation library. Both Chinese and English render with high-quality system stacks — no web font downloads.
+No search, comments, CMS, authentication, database, analytics, AI assistant, series, related-post algorithms, photography gallery, lightbox, client framework, Tailwind, or animation library. Both Chinese and English render with high-quality system stacks — no web font downloads.
 
-These features are not forbidden; they simply have not earned their complexity yet.
+Search is **intentionally deferred**: at the current scale, year/month plus tags are enough to find things, and search only earns its complexity once the archive is genuinely hard to browse. Series, previous/next, related posts, and a table of contents are deferred for the same reason.
 
 ## License and author
 

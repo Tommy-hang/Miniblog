@@ -1,6 +1,7 @@
 ---
 import { Image } from "astro:assets";
 import BaseLayout from "./BaseLayout.astro";
+import TagLinks from "../components/TagLinks.astro";
 import { contentStrings, type Locale } from "../i18n/ui";
 import { formatDate, formatMonthYear, type ContentEntry } from "../lib/content";
 
@@ -24,7 +25,7 @@ const project = entry.collection === "projects" ? entry.data : undefined;
   <article class="article-page">
     <header class="article-header">
       <p class="eyebrow">
-        <span>{kind === "writing" ? (tags[0] ?? strings.essay) : (tags[0] ?? strings.piece)}</span>
+        <TagLinks tags={tags} fallback={kind === "writing" ? strings.essay : strings.piece} />
         {project?.status && <span>{project.status}</span>}
         <time datetime={date.toISOString()}>{formatDate(date, locale)}</time>
         <span>{strings.readingTime(readingTime)}</span>

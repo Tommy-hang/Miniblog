@@ -1,10 +1,14 @@
 ---
-import ArticleList from "../../components/ArticleList.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { allWriting } from "../../lib/content";
+import WritingArchive from "../../components/WritingArchive.astro";
+import { allWriting, groupWritingByYear, tagsInUse } from "../../lib/content";
+import { tagSlug } from "../../lib/tags";
 
 const posts = await allWriting();
+const groups = groupWritingByYear(posts);
 const count = String(posts.length).padStart(2, "0");
+const navTags = tagsInUse(posts);
+const base = import.meta.env.BASE_URL;
 ---
 
 <BaseLayout
@@ -17,7 +21,11 @@ const count = String(posts.length).padStart(2, "0");
     <h1>Writing<span>.</span></h1>
     <p>Essays and field notes about building, understanding, and paying closer attention.</p>
   </header>
+  <nav class="tag-nav" aria-label="Browse writing by topic">
+    <a href={`${base}writing/`} aria-current="page">All</a>
+    {navTags.map((name) => <a href={`${base}tags/${tagSlug(name)}/`}>{name}</a>)}
+  </nav>
   <section class="writing-index" aria-label="All writing">
-    <ArticleList posts={posts} />
+    <WritingArchive groups={groups} />
   </section>
 </BaseLayout>
