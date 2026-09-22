@@ -1,33 +1,36 @@
 ---
-import { formatIndexDate, slugOf, type WritingEntry } from "../lib/content";
-import { t, type Locale } from "../i18n/ui";
+import { contentStrings, contentLanguageLabel } from "../i18n/ui";
+import { formatIndexDate, localeOf, slugOf, type WritingEntry } from "../lib/content";
 
 interface Props {
   posts: WritingEntry[];
-  locale: Locale;
 }
 
-const { posts, locale } = Astro.props;
-const strings = t(locale);
+const { posts } = Astro.props;
 const base = import.meta.env.BASE_URL;
-const prefix = locale === "en" ? `${base}en/` : base;
+
+const hrefFor = (post: WritingEntry) =>
+  `${base}${localeOf(post) === "en" ? "en/" : ""}writing/${slugOf(post)}/`;
 ---
 
 <ol class="article-list">
-  {posts.map((post, index) => (
-    <li>
-      <a href={`${prefix}writing/${slugOf(post)}/`}>
-        <span class="article-number" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
-        <span class="article-copy">
-          <strong>{post.data.title}</strong>
-          <span>{post.data.description}</span>
-        </span>
-        <span class="article-meta">
-          <span>{post.data.tags[0] ?? strings.essay}</span>
-          <time datetime={post.data.date.toISOString()}>{formatIndexDate(post.data.date, locale)}</time>
-        </span>
-        <span class="article-arrow" aria-hidden="true">↗</span>
-      </a>
-    </li>
-  ))}
+  {posts.map((post, index) => {
+    const locale = localeOf(post);
+    return (
+      <li>
+        <a href={hrefFor(post)}>
+          <span class="article-number" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+          <span class="article-copy" lang={locale === "zh" ? "zh-CN" : undefined}>
+            <strong>{post.data.title}</strong>
+            <span>{post.data.description}</span>
+          </span>
+          <span class="article-meta">
+            <span>{post.data.tags[0] ?? contentStrings(locale).essay}</span>
+            <span>{formatIndexDate(post.data.date)} · {contentLanguageLabel[locale]}</span>
+          </span>
+          <span class="article-arrow" aria-hidden="true">↗</span>
+        </a>
+      </li>
+    );
+  })}
 </ol>

@@ -1,17 +1,12 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { site } from "../site";
-import { t } from "../i18n/ui";
-
-const locale = "zh" as const;
-const strings = t(locale);
-const base = import.meta.env.BASE_URL;
 ---
 
-<BaseLayout locale={locale} title={strings.navAbout} description="关于这个出版物和它背后的人。" alternate={`${base}en/about/`}>
+<BaseLayout locale="zh" title="About" description="关于这个出版物和它背后的人。">
   <article class="about-page">
     <header>
-      <p class="index-label">关于 · 第 02 期</p>
+      <p class="index-label">About</p>
       <h1>一个安放<br /><em>未完成想法</em>的地方。</h1>
     </header>
     <div class="about-copy">

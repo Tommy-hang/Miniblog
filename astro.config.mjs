@@ -5,9 +5,20 @@ const repository = process.env.GITHUB_REPOSITORY?.split("/")[1];
 const owner = process.env.GITHUB_REPOSITORY_OWNER;
 const isUserSite = repository === `${owner}.github.io`;
 
+// Compatibility redirects from the old mirrored English pages.
+const redirects = ["/en/", "/en/about/", "/en/writing/", "/en/projects/"];
+
 export default defineConfig({
   site: process.env.SITE_URL ?? (owner ? `https://${owner}.github.io` : "https://example.com"),
   base: process.env.BASE_PATH ?? (repository && !isUserSite ? `/${repository}` : "/"),
   trailingSlash: "always",
-  integrations: [sitemap({ filter: (page) => !page.endsWith("/404/") })],
+  integrations: [
+    sitemap({
+      filter: (page) => {
+        const path = new URL(page).pathname;
+        if (path.endsWith("/404/")) return false;
+        return !redirects.some((redirect) => path.endsWith(redirect));
+      },
+    }),
+  ],
 });

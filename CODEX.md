@@ -32,6 +32,50 @@
 
 ---
 
+# 0.5 Brand Language vs Content Language
+
+> V1.2 起，这是 MiniBlog 语言模型的最高优先级约束。未来版本不得违背。
+
+## 原则
+
+```text
+The interface has a voice.
+The content has a language.
+```
+
+- **品牌语言 / 界面语言固定为 English。** 导航（`Writing` / `Projects` / `About`）、首页文案（`Thinking in public.`、`Selected Writing`、`Currently`）、页脚、404 等所有品牌与 UI 文案，不随内容语言改变，也不提供全局语言切换。
+- **内容语言可以是中文、English，或一对互译版本。** 首页与 Writing / Projects 归档同时展示两种语言的内容，用 `ZH` / `EN` 作为轻量 metadata。内容以目录（`zh/`、`en/`）作为语言的唯一来源。
+- **翻译属于内容，不属于整个网站。** 语言切换只出现在内容详情页，并且只在对应翻译**已发布**时出现；不存在则完全不显示（没有 disabled state、没有 placeholder）。
+
+## 由此确定的结构
+
+```text
+一个首页 /          （品牌英文 + 中英混合内容）
+一个 /writing/      （中英混合归档）
+一个 /projects/     （中英混合归档）
+一个 /about/        （英文界面 + 中文正文）
+```
+
+内容详情保留稳定的语言路由：
+
+```text
+/writing/<slug>/       中文
+/en/writing/<slug>/    English
+/projects/<slug>/      中文
+/en/projects/<slug>/   English
+```
+
+## 约束
+
+- 不要重新引入全局语言切换器（dropdown / pill / globe / selector）。
+- 不要重新建立 `/en/` 第二套首页或 `/en/about/` 第二套 About；旧 URL 只做静态重定向。
+- 不要把 Header 导航根据当前文章语言翻译成中文。即使用户在读中文文章，Header 仍为英文。
+- 不要为品牌页面维护 zh / en 两套文案字典。只有随内容语言变化的少量文案（如阅读时间、发布 / 更新、返回索引）才进入 `src/i18n/ui.ts`。
+- Translation lookup 必须遵守 production visibility：draft 翻译不得被当作可访问翻译。
+- Translation pair 仍以相同 slug 匹配，不引入 translation database 或额外 ID。
+
+---
+
 # 1. MiniBlog 是什么
 
 MiniBlog 是一个面向个人创作者、技术学习者和长期写作者的现代个人博客。

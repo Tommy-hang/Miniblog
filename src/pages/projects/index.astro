@@ -1,22 +1,23 @@
 ---
 import ProjectList from "../../components/ProjectList.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { t } from "../../i18n/ui";
-import { publishedProjects } from "../../lib/content";
+import { allProjects } from "../../lib/content";
 
-const locale = "zh" as const;
-const strings = t(locale);
-const projects = await publishedProjects(locale);
-const base = import.meta.env.BASE_URL;
+const projects = await allProjects();
+const count = String(projects.length).padStart(2, "0");
 ---
 
-<BaseLayout locale={locale} title={strings.navProjects} description={strings.siteDescription} alternate={`${base}en/projects/`}>
+<BaseLayout
+  locale="en"
+  title="Projects"
+  description="Selected works and the stories behind the small systems I build and maintain."
+>
   <header class="page-header">
-    <p class="index-label">{strings.archive} · {projects.length} {strings.projectsCount}</p>
-    <h1>项目<span>。</span></h1>
-    <p>正在构建与维护的小系统，以及它们背后的故事。</p>
+    <p class="index-label">Archive · {count} works</p>
+    <h1>Projects<span>.</span></h1>
+    <p>Selected works and the stories behind the small systems I build and maintain.</p>
   </header>
-  <section class="writing-index" aria-label={strings.projectsSection}>
-    <ProjectList projects={projects} locale={locale} />
+  <section class="writing-index" aria-label="All projects">
+    <ProjectList projects={projects} />
   </section>
 </BaseLayout>

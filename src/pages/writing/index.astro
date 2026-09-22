@@ -1,22 +1,23 @@
 ---
 import ArticleList from "../../components/ArticleList.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { t } from "../../i18n/ui";
-import { publishedWriting } from "../../lib/content";
+import { allWriting } from "../../lib/content";
 
-const locale = "zh" as const;
-const strings = t(locale);
-const posts = await publishedWriting(locale);
-const base = import.meta.env.BASE_URL;
+const posts = await allWriting();
+const count = String(posts.length).padStart(2, "0");
 ---
 
-<BaseLayout locale={locale} title={strings.navWriting} description={strings.siteDescription} alternate={`${base}en/writing/`}>
+<BaseLayout
+  locale="en"
+  title="Writing"
+  description="Essays and field notes about building, understanding, and paying closer attention."
+>
   <header class="page-header">
-    <p class="index-label">{strings.archive} · {posts.length} {strings.writingCount}</p>
-    <h1>文章<span>。</span></h1>
-    <p>关于构建、理解与更仔细观看的随笔和现场笔记。</p>
+    <p class="index-label">Archive · {count} pieces</p>
+    <h1>Writing<span>.</span></h1>
+    <p>Essays and field notes about building, understanding, and paying closer attention.</p>
   </header>
-  <section class="writing-index" aria-label={strings.writingSection}>
-    <ArticleList posts={posts} locale={locale} />
+  <section class="writing-index" aria-label="All writing">
+    <ArticleList posts={posts} />
   </section>
 </BaseLayout>

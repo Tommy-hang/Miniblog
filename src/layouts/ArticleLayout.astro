@@ -1,7 +1,7 @@
 ---
 import { Image } from "astro:assets";
 import BaseLayout from "./BaseLayout.astro";
-import { t, type Locale } from "../i18n/ui";
+import { contentStrings, type Locale } from "../i18n/ui";
 import { formatDate, type ContentEntry } from "../lib/content";
 
 interface Props {
@@ -13,9 +13,9 @@ interface Props {
 
 const { entry, locale, readingTime, alternate } = Astro.props;
 const { title, description, date, tags, updated, cover } = entry.data;
-const strings = t(locale);
+const strings = contentStrings(locale);
 const kind = entry.collection === "writing" ? "writing" : "projects";
-const backHref = `${import.meta.env.BASE_URL}${locale === "en" ? "en/" : ""}${kind}/`;
+const backHref = `${import.meta.env.BASE_URL}${kind}/`;
 const backLabel = kind === "writing" ? strings.allWriting : strings.allProjects;
 ---
 
@@ -28,7 +28,12 @@ const backLabel = kind === "writing" ? strings.allWriting : strings.allProjects;
         <time datetime={date.toISOString()}>{formatDate(date, locale)}</time>
         <span>{strings.readingTime(readingTime)}</span>
         {alternate && (
-          <a class="translation-link" href={alternate} hreflang={locale === "zh" ? "en" : "zh-CN"} lang={locale === "zh" ? "en" : "zh-CN"}>
+          <a
+            class="translation-link"
+            href={alternate}
+            hreflang={locale === "zh" ? "en" : "zh-CN"}
+            lang={locale === "zh" ? "en" : "zh-CN"}
+          >
             {locale === "zh" ? "EN" : "中文"}
           </a>
         )}

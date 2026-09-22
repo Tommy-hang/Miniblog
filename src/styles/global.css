@@ -9,8 +9,17 @@
   --color-border: #c9c4b9;
   --color-accent: #d84a32;
   --color-selection: #f0a493;
-  --font-sans: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Source Han Sans SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+  /*
+   * No web font is shipped. The first entry is a real system family rather
+   * than a phantom "Inter" that never loads, so the declared stack is honest
+   * and behaves the same on a given platform. Chinese resolves to a
+   * high-quality system CJK face below.
+   */
+  --font-sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Source Han Sans SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
   --font-serif: Iowan Old Style, Baskerville, "Times New Roman", serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --reading-width: 44rem;
+  --wide-width: min(60rem, calc(100vw - 3rem));
   --space-1: 0.5rem;
   --space-2: 0.75rem;
   --space-3: 1rem;
@@ -52,6 +61,7 @@ body {
 }
 img { display: block; max-width: 100%; height: auto; }
 a { color: inherit; }
+code, pre, kbd, samp { font-family: var(--font-mono); }
 button, input, textarea, select { font: inherit; }
 ::selection { background: var(--color-selection); color: var(--color-text); }
 
@@ -143,7 +153,6 @@ a:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 5px; }
   padding-block: var(--space-7);
   border-bottom: 1px solid var(--color-border);
 }
-.home-hero .index-label { grid-column: 1 / 5; align-self: start; }
 .home-hero h1 { grid-column: 1 / 13; margin-block: var(--space-6); }
 .home-hero h1 em { color: var(--color-accent); }
 .hero-intro {
@@ -229,17 +238,9 @@ a:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 5px; }
 .currently ul { margin: 0; padding: 0; list-style: none; color: var(--color-text-secondary); }
 .place { display: flex; justify-content: space-between; align-self: end; margin: 0; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; }
 
-/* Language switch: small, quiet, a plain link — no dropdown, no JS. */
-.lang-switch {
-  padding: 0.3em 0.7em;
-  border: 1px solid var(--color-border);
-  border-radius: 999px;
-  transition: border-color 200ms ease, color 200ms ease;
-}
-.lang-switch:hover { border-color: var(--color-accent); color: var(--color-accent); }
-
-/* Project rows share the editorial index rhythm; the cover appears only
- * on hover-capable pointers, as a restrained floating preview. */
+/* Project rows share the editorial index rhythm. The cover is a floating
+ * preview on pointer devices with room, and an inline visual trace
+ * everywhere else, so Projects never reads as a second Writing list. */
 .project-list a { overflow: visible; }
 .project-preview {
   position: absolute;
@@ -257,6 +258,21 @@ a:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 5px; }
 @media (hover: hover) and (min-width: 56rem) {
   .project-list a:hover .project-preview,
   .project-list a:focus-visible .project-preview { opacity: 1; transform: translateY(-50%); }
+}
+/* No room for a floating preview (touch, tablet, narrow window): the cover
+ * becomes a restrained wide strip inside the row. Projects ≠ Writing. */
+@media (hover: none), (max-width: 56rem) {
+  .project-list .project-preview {
+    position: static;
+    grid-column: 1 / -1;
+    width: 100%;
+    height: clamp(7rem, 32vw, 11rem);
+    margin-block-start: var(--space-4);
+    border: 1px solid var(--color-border);
+    opacity: 1;
+    transform: none;
+    object-fit: cover;
+  }
 }
 
 /* 7. Inner pages */
@@ -293,28 +309,26 @@ a:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 5px; }
 .article-header .eyebrow { grid-column: 1 / 13; display: flex; gap: var(--space-5); align-items: center; flex-wrap: wrap; }
 .translation-link {
   margin-inline-start: auto;
-  padding: 0.25em 0.7em;
-  border: 1px solid var(--color-border);
-  border-radius: 999px;
   color: var(--color-text-secondary);
-  font-size: 0.68rem;
-  letter-spacing: 0.1em;
-  text-decoration: none;
-  transition: border-color 200ms ease, color 200ms ease;
+  text-decoration: underline;
+  text-decoration-color: var(--color-border);
+  text-underline-offset: 0.3em;
+  transition: color 200ms ease, text-decoration-color 200ms ease;
 }
-.translation-link:hover { border-color: var(--color-accent); color: var(--color-accent); }
+.translation-link:hover { color: var(--color-accent); text-decoration-color: var(--color-accent); }
 .article-header h1 { grid-column: 1 / 12; margin-block: var(--space-5) var(--space-6); font-size: clamp(3.7rem, 8.5vw, 8rem); }
 .article-lead { grid-column: 7 / 12; margin: 0; color: var(--color-text-secondary); font-family: var(--font-serif); font-size: clamp(1.4rem, 2.2vw, 2rem); line-height: 1.35; }
 :lang(zh) .article-lead { font-family: inherit; line-height: 1.6; letter-spacing: 0.01em; }
 .article-updated { grid-column: 7 / 12; margin: var(--space-4) 0 0; color: var(--color-text-tertiary); font-size: 0.75rem; letter-spacing: 0.04em; }
 .article-cover {
   grid-column: 1 / 13;
-  width: 100%;
+  justify-self: center;
+  width: min(100%, var(--reading-width));
   height: auto;
   margin-block-start: var(--space-6);
   border: 1px solid var(--color-border);
 }
-.article-body { width: min(100%, 44rem); margin-inline: auto; padding-block: var(--space-8); }
+.article-body { width: min(100%, var(--reading-width)); margin-inline: auto; padding-block: var(--space-8); }
 .article-body > * { margin-block: 0 var(--space-5); }
 .article-body p, .article-body li { line-height: 1.78; }
 :lang(zh) .article-body p, :lang(zh) .article-body li { line-height: 1.95; letter-spacing: 0.01em; }
@@ -347,6 +361,16 @@ a:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 5px; }
 .article-body pre code { padding: 0; background: transparent; }
 .article-body hr { margin-block: var(--space-8); border: 0; border-top: 1px solid var(--color-border); }
 .article-body img { margin-block: var(--space-6); border: 1px solid var(--color-border); }
+/* A paragraph that holds only an image should not add its own rhythm. */
+.article-body p:has(> img:only-child) { margin-bottom: 0; }
+/* `![alt](./image.webp "wide")` breaks gently out of the reading column. */
+.article-body img[title="wide"] {
+  width: var(--wide-width);
+  max-width: none;
+  margin-inline: calc((100% - var(--wide-width)) / 2);
+}
+/* Long tables stay readable: normal on wide screens, horizontally
+ * scrollable (rather than squeezed or overflowing) on narrow ones. */
 .article-body table { width: 100%; margin-block: var(--space-6); border-collapse: collapse; font-size: 0.9rem; }
 .article-body th, .article-body td { padding: var(--space-2) var(--space-3); border-bottom: 1px solid var(--color-border); text-align: left; vertical-align: top; }
 .article-body th { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; }
@@ -378,7 +402,7 @@ a:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 5px; }
 /* 10. Responsive and motion */
 @media (max-width: 56rem) {
   .home-hero { min-height: auto; }
-  .home-hero .index-label, .home-hero h1 { grid-column: 1 / 13; }
+  .home-hero h1 { grid-column: 1 / 13; }
   .hero-intro { grid-column: 1 / 9; }
   .scroll-cue { grid-column: 10 / 13; }
   .section-heading .eyebrow { grid-column: 1 / 5; }
@@ -409,7 +433,7 @@ a:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 5px; }
   .article-number { padding-top: 0.25rem; }
   .article-copy > span { font-size: 0.85rem; }
   .article-meta { grid-column: 2 / 4; flex-wrap: wrap; }
-  .project-preview { display: none; }
+  .article-body table { display: block; overflow-x: auto; border-spacing: 0; white-space: nowrap; }
   .currently { display: block; }
   .currently h2 { margin-block: var(--space-4) var(--space-6); }
   .currently .place { margin-top: var(--space-7); }

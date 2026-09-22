@@ -2,28 +2,33 @@
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import { site } from "../site";
-import { htmlLang, t, type Locale } from "../i18n/ui";
+import { htmlLang, type Locale } from "../i18n/ui";
 import "../styles/global.css";
 
 interface Props {
+  /**
+   * The language of the page's content. Brand pages (home, archives, about)
+   * pass "en" because their interface is English; article and project pages
+   * pass the content's own language.
+   */
   locale?: Locale;
   title?: string;
   description?: string;
   image?: string;
   type?: "website" | "article";
-  /** Path of this page in the other locale, when a real counterpart exists. */
+  /** Path of the published translation, when a real counterpart exists. */
   alternate?: string;
 }
 
 const {
-  locale = "zh",
+  locale = "en",
   title,
-  description = t(locale).siteDescription,
+  description = site.description,
   image = `${import.meta.env.BASE_URL}social-card.svg`,
   type = "website",
   alternate,
 } = Astro.props;
-const strings = t(locale);
+const base = import.meta.env.BASE_URL;
 const pageTitle = title ? `${title} — ${site.name}` : `${site.name} — ${site.title}`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const socialImage = new URL(image, Astro.site);
@@ -40,8 +45,9 @@ const ogLocale = locale === "zh" ? "zh_CN" : "en_US";
     <meta name="theme-color" content="#f3f0e9" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#171714" media="(prefers-color-scheme: dark)" />
     <link rel="canonical" href={canonical} />
-    <link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}favicon.svg`} />
-    <link rel="alternate" type="application/rss+xml" title={site.name} href={`${import.meta.env.BASE_URL}${locale === "en" ? "en/" : ""}rss.xml`} />
+    <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
+    <link rel="alternate" type="application/rss+xml" title={`${site.name} — 中文`} href={`${base}rss.xml`} />
+    <link rel="alternate" type="application/rss+xml" title={`${site.name} — English`} href={`${base}en/rss.xml`} />
     {alternate && (
       <link rel="alternate" hreflang={htmlLang[locale === "zh" ? "en" : "zh"]} href={new URL(alternate, Astro.site)} />
     )}
@@ -58,13 +64,13 @@ const ogLocale = locale === "zh" ? "zh_CN" : "en_US";
     <title>{pageTitle}</title>
   </head>
   <body>
-    <a class="skip-link" href="#content">{strings.skipToContent}</a>
+    <a class="skip-link" href="#content">Skip to content</a>
     <div class="page-shell">
-      <Header locale={locale} alternate={alternate} />
+      <Header />
       <main id="content">
         <slot />
       </main>
-      <Footer locale={locale} />
+      <Footer />
     </div>
   </body>
 </html>

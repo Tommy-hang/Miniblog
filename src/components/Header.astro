@@ -1,51 +1,30 @@
 ---
 import { site } from "../site";
-import { t, type Locale } from "../i18n/ui";
 
-interface Props {
-  locale: Locale;
-  alternate?: string;
-}
-
-const { locale, alternate } = Astro.props;
-const strings = t(locale);
 const base = import.meta.env.BASE_URL;
-const prefix = locale === "en" ? `${base}en/` : base;
 const pathname = Astro.url.pathname;
 
+/*
+ * Navigation is permanent brand English. Even while reading a Chinese
+ * article, the header stays "Writing / Projects / About" — intentional,
+ * not a missing translation.
+ */
 const navItems = [
-  { href: `${prefix}writing/`, label: strings.navWriting, match: "/writing/" },
-  { href: `${prefix}projects/`, label: strings.navProjects, match: "/projects/" },
-  { href: `${prefix}about/`, label: strings.navAbout, match: "/about/" },
+  { href: `${base}writing/`, label: "Writing", match: "/writing/" },
+  { href: `${base}projects/`, label: "Projects", match: "/projects/" },
+  { href: `${base}about/`, label: "About", match: "/about/" },
 ];
 ---
 
 <header class="site-header">
-  <a class="wordmark" href={prefix} aria-label={`${site.name}, home`}>
+  <a class="wordmark" href={base} aria-label={`${site.name}, home`}>
     {site.name}<span aria-hidden="true">*</span>
   </a>
-  <nav aria-label={strings.primaryNav}>
+  <nav aria-label="Primary navigation">
     {navItems.map((item) => (
-      <a
-        href={item.href}
-        aria-current={pathname.startsWith(`${base}${item.match}`) || (locale === "en" && pathname.startsWith(`${base}en${item.match}`)) ? "page" : undefined}
-      >
+      <a href={item.href} aria-current={pathname.includes(item.match) ? "page" : undefined}>
         {item.label}
       </a>
     ))}
-    {alternate ? (
-      <a class="lang-switch" href={alternate} hreflang={locale === "zh" ? "en" : "zh-CN"} lang={locale === "zh" ? "en" : "zh-CN"}>
-        {strings.switchLang}
-      </a>
-    ) : (
-      <a
-        class="lang-switch"
-        href={locale === "zh" ? `${base}en/` : base}
-        hreflang={locale === "zh" ? "en" : "zh-CN"}
-        lang={locale === "zh" ? "en" : "zh-CN"}
-      >
-        {strings.switchLang}
-      </a>
-    )}
   </nav>
 </header>

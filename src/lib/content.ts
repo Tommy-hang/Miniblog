@@ -20,20 +20,44 @@ export function slugOf(entry: ContentEntry): string {
   return withoutLocale.replace(/\/index$/, "");
 }
 
+const byDateDesc = <T extends ContentEntry>(a: T, b: T) =>
+  b.data.date.valueOf() - a.data.date.valueOf();
+
+/**
+ * Drafts are hidden in production but stay previewable in `npm run dev`.
+ * Every published lookup must pass through this rule so a draft translation
+ * is never treated as an accessible counterpart.
+ */
+function isVisible({ data }: { data: { draft: boolean } }): boolean {
+  return !(import.meta.env.PROD && data.draft);
+}
+
+/** Every published writing entry, both languages, newest first. */
+export async function allWriting(): Promise<WritingEntry[]> {
+  const entries = await getCollection("writing", isVisible);
+  return entries.sort(byDateDesc);
+}
+
+/** Every published project entry, both languages, newest first. */
+export async function allProjects(): Promise<ProjectEntry[]> {
+  const entries = await getCollection("projects", isVisible);
+  return entries.sort(byDateDesc);
+}
+
 export async function publishedWriting(locale: Locale): Promise<WritingEntry[]> {
-  const entries = await getCollection("writing", ({ data, id }) => {
-    if (import.meta.env.PROD && data.draft) return false;
-    return id.startsWith(`${locale}/`);
-  });
-  return entries.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+  const entries = await getCollection(
+    "writing",
+    ({ data, id }) => isVisible({ data }) && id.startsWith(`${locale}/`),
+  );
+  return entries.sort(byDateDesc);
 }
 
 export async function publishedProjects(locale: Locale): Promise<ProjectEntry[]> {
-  const entries = await getCollection("projects", ({ data, id }) => {
-    if (import.meta.env.PROD && data.draft) return false;
-    return id.startsWith(`${locale}/`);
-  });
-  return entries.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+  const entries = await getCollection(
+    "projects",
+    ({ data, id }) => isVisible({ data }) && id.startsWith(`${locale}/`),
+  );
+  return entries.sort(byDateDesc);
 }
 
 /** Homepage picks featured first, newest first; falls back to latest when nothing is featured. */
@@ -42,11 +66,14 @@ export function featuredOrLatest<T extends ContentEntry>(entries: T[], limit: nu
   return (featured.length > 0 ? featured : entries).slice(0, limit);
 }
 
-/** Returns the same-slug entry in the other locale, if it exists. */
+/** Returns the published same-slug entry in the other locale, if it exists. */
 export async function translationOf(entry: ContentEntry): Promise<ContentEntry | undefined> {
   const collection = entry.collection === "writing" ? "writing" : "projects";
   const other: Locale = localeOf(entry) === "zh" ? "en" : "zh";
-  const entries = await getCollection(collection, ({ id }) => id.startsWith(`${other}/`));
+  const entries = await getCollection(
+    collection,
+    ({ data, id }) => isVisible({ data }) && id.startsWith(`${other}/`),
+  );
   const slug = slugOf(entry);
   return entries.find((candidate) => slugOf(candidate) === slug);
 }
@@ -75,13 +102,9 @@ export function formatDate(date: Date, locale: Locale): string {
   }).format(date);
 }
 
-/** "SEP 22, 2026" — compact uppercase label for editorial index rows. */
-export function formatIndexDate(date: Date, locale: Locale): string {
-  return new Intl.DateTimeFormat(locale === "zh" ? "zh-CN" : "en", {
-    day: "2-digit",
-    month: locale === "zh" ? "long" : "short",
-    year: "numeric",
-  })
+/** "SEP 22, 2026" — one English editorial label for every archive row. */
+export function formatIndexDate(date: Date): string {
+  return new Intl.DateTimeFormat("en", { day: "2-digit", month: "short", year: "numeric" })
     .format(date)
     .toUpperCase();
 }
