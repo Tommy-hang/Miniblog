@@ -197,6 +197,41 @@ Search、Pagination、客户端 filter、Category、Topic、Series、Related pos
 
 ---
 
+# 0.8 Publishing & Reliability
+
+> V1.5 建立。作者侧的长期可用性约束。
+
+## 目标
+
+让作者日常只做：想法 → 创建内容 → Markdown + 图片 → 验证 → push → 自动部署。
+不再手工复制 frontmatter、猜 slug、担心 tag 拼错、担心错误内容直接上线。
+
+## 原则
+
+- **创建内容不需要改页面。** 新文章 / 项目只新增 Markdown 与图片；`pages` / `components` / `layouts` / `styles` 不参与日常发布。
+- **新内容默认 `draft: true`。** 创建不等于发布；发布永远是作者显式地把 draft 改成 false。
+- **自动化移除重复劳动，而不是隐藏架构。** 脚本只做脚手架与检查，作者仍能打开 `content/`、`scripts/` 看懂结构。不建立 CMS、数据库或隐藏状态。
+- **验证发生在部署之前。** 本地统一入口是 `npm run verify`（validate:content → check → build）；CI 在 deploy 前执行同一套。
+- **Astro / Zod 是 schema 的唯一权威。** 字段类型、必填、tag 词表、图片引用由 schema 负责；自定义 validator 不重复实现，只补 schema 看不到的跨内容一致性。
+- **自定义校验只覆盖跨内容规则**：重复身份、翻译结构、`updated < date`、published 缺 description / title、draft + featured、空正文、slug 规范。
+- **错误内容不得部署。** validation / check / build 任一失败，部署必须停止（退出码非 0）。
+- **Validator 只读。** 不自动修 tag、改 slug、改 date、删除 frontmatter；不提供 `--fix`。
+- **Build-time reliability over runtime safeguards。** 不引入客户端守卫、运行时校验或后台。
+
+## 命令
+
+```text
+npm run new               交互式创建 Writing / Project / Translation
+npm run validate:content  跨内容完整性检查（只读）
+npm run verify            发布前统一检查：validate → check → build
+```
+
+## 不做
+
+Search、Series、Related、CMS、Database、Admin UI、Web editor、Content API、Analytics、publish / delete / edit 命令、auto-fix。发布行为保持显式（改 draft + git commit / push）。
+
+---
+
 # 1. MiniBlog 是什么
 
 MiniBlog 是一个面向个人创作者、技术学习者和长期写作者的现代个人博客。

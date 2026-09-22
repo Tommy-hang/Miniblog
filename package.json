@@ -1,13 +1,19 @@
 {
   "name": "miniblog",
   "type": "module",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "private": true,
+  "engines": {
+    "node": ">=22.12"
+  },
   "scripts": {
     "dev": "astro dev",
     "check": "astro check",
     "build": "astro check && astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "new": "node scripts/new-content.mjs",
+    "validate:content": "node scripts/validate-content.mjs",
+    "verify": "npm run validate:content && npm run check && npm run build"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.19",

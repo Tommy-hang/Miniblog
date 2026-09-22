@@ -21,7 +21,14 @@ const backLabel = kind === "writing" ? strings.allWriting : strings.allProjects;
 const project = entry.collection === "projects" ? entry.data : undefined;
 ---
 
-<BaseLayout locale={locale} title={title} description={description} type="article" alternate={alternate}>
+<BaseLayout
+  locale={locale}
+  title={title}
+  description={description}
+  image={cover?.src}
+  type="article"
+  alternate={alternate}
+>
   <article class="article-page">
     <header class="article-header">
       <p class="eyebrow">
