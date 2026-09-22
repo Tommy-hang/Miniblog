@@ -1,0 +1,22 @@
+---
+import { render } from "astro:content";
+import ArticleLayout from "../../../layouts/ArticleLayout.astro";
+import { localeOf, publishedProjects, readingTimeMinutes, slugOf, translationOf } from "../../../lib/content";
+
+export async function getStaticPaths() {
+  const projects = await publishedProjects("en");
+  return projects.map((entry) => ({ params: { slug: slugOf(entry) }, props: { entry } }));
+}
+
+const base = import.meta.env.BASE_URL;
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const locale = localeOf(entry);
+const translation = await translationOf(entry);
+const alternate = translation ? `${base}projects/${slugOf(translation)}/` : undefined;
+const readingTime = readingTimeMinutes(entry.body ?? "", locale);
+---
+
+<ArticleLayout entry={entry} locale={locale} readingTime={readingTime} alternate={alternate}>
+  <Content />
+</ArticleLayout>

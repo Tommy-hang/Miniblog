@@ -1,30 +1,30 @@
 ---
-import type { CollectionEntry } from "astro:content";
+import { formatIndexDate, slugOf, type WritingEntry } from "../lib/content";
+import { t, type Locale } from "../i18n/ui";
 
 interface Props {
-  posts: CollectionEntry<"writing">[];
+  posts: WritingEntry[];
+  locale: Locale;
 }
 
-const { posts } = Astro.props;
+const { posts, locale } = Astro.props;
+const strings = t(locale);
 const base = import.meta.env.BASE_URL;
-const formatDate = (date: Date) =>
-  new Intl.DateTimeFormat("en", { day: "2-digit", month: "short", year: "numeric" })
-    .format(date)
-    .toUpperCase();
+const prefix = locale === "en" ? `${base}en/` : base;
 ---
 
 <ol class="article-list">
   {posts.map((post, index) => (
     <li>
-      <a href={`${base}writing/${post.id}/`}>
+      <a href={`${prefix}writing/${slugOf(post)}/`}>
         <span class="article-number" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
         <span class="article-copy">
           <strong>{post.data.title}</strong>
           <span>{post.data.description}</span>
         </span>
         <span class="article-meta">
-          <span>{post.data.tags[0] ?? "Essay"}</span>
-          <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
+          <span>{post.data.tags[0] ?? strings.essay}</span>
+          <time datetime={post.data.date.toISOString()}>{formatIndexDate(post.data.date, locale)}</time>
         </span>
         <span class="article-arrow" aria-hidden="true">↗</span>
       </a>

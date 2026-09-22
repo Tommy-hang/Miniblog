@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#e9e4da"/>
+  <g fill="none" stroke="#1d1d1a" stroke-width="2">
+    <rect x="120" y="120" width="960" height="390"/>
+    <line x1="120" y1="200" x2="1080" y2="200"/>
+    <line x1="360" y1="200" x2="360" y2="510"/>
+    <line x1="760" y1="200" x2="760" y2="510"/>
+    <line x1="120" y1="320" x2="360" y2="320"/>
+    <line x1="120" y1="415" x2="360" y2="415"/>
+    <line x1="400" y1="285" x2="720" y2="285"/>
+    <line x1="400" y1="345" x2="660" y2="345"/>
+    <line x1="400" y1="405" x2="700" y2="405"/>
+    <line x1="800" y1="285" x2="1040" y2="285"/>
+    <line x1="800" y1="345" x2="1000" y2="345"/>
+    <line x1="800" y1="405" x2="1030" y2="405"/>
+  </g>
+  <circle cx="330" cy="160" r="8" fill="#d84a32"/>
+  <text x="150" y="170" font-family="Arial,sans-serif" font-size="30" letter-spacing="6" fill="#1d1d1a">MINIBLOG</text>
+  <text x="150" y="475" font-family="Arial,sans-serif" font-size="22" fill="#5f5d57">WRITING</text>
+  <text x="150" y="268" font-family="Arial,sans-serif" font-size="22" fill="#5f5d57">INDEX</text>
+</svg>

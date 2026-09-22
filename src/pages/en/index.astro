@@ -1,12 +1,12 @@
 ---
-import ArticleList from "../components/ArticleList.astro";
-import ProjectList from "../components/ProjectList.astro";
-import BaseLayout from "../layouts/BaseLayout.astro";
-import { site } from "../site";
-import { t } from "../i18n/ui";
-import { featuredOrLatest, publishedProjects, publishedWriting } from "../lib/content";
+import ArticleList from "../../components/ArticleList.astro";
+import ProjectList from "../../components/ProjectList.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { site } from "../../site";
+import { t } from "../../i18n/ui";
+import { featuredOrLatest, publishedProjects, publishedWriting } from "../../lib/content";
 
-const locale = "zh" as const;
+const locale = "en" as const;
 const strings = t(locale);
 const writing = await publishedWriting(locale);
 const projects = await publishedProjects(locale);
@@ -15,7 +15,7 @@ const selectedProjects = featuredOrLatest(projects, 3);
 const base = import.meta.env.BASE_URL;
 ---
 
-<BaseLayout locale={locale} alternate={`${base}en/`}>
+<BaseLayout locale={locale} alternate={base}>
   <section class="home-hero" aria-labelledby="hero-title">
     <p class="index-label">{strings.heroLabel}</p>
     <h1 id="hero-title">{strings.heroTop}<br /><em>{strings.heroEm}</em></h1>
@@ -26,19 +26,19 @@ const base = import.meta.env.BASE_URL;
   <section class="home-writing" id="selected" aria-labelledby="selected-title">
     <div class="section-heading">
       <p class="eyebrow">{strings.selectedWriting}</p>
-      <h2 id="selected-title">值得反复<br />阅读的想法。</h2>
+      <h2 id="selected-title">Ideas worth<br />returning to.</h2>
     </div>
     <ArticleList posts={selectedWriting} locale={locale} />
-    <a class="text-link" href={`${base}writing/`}>{strings.viewAllWriting} <span>→</span></a>
+    <a class="text-link" href={`${base}en/writing/`}>{strings.viewAllWriting} <span>→</span></a>
   </section>
 
   <section class="home-projects" aria-labelledby="projects-title">
     <div class="section-heading">
       <p class="eyebrow">{strings.selectedProjects}</p>
-      <h2 id="projects-title">正在构建的<br />小系统。</h2>
+      <h2 id="projects-title">Small systems<br />in progress.</h2>
     </div>
     <ProjectList projects={selectedProjects} locale={locale} />
-    <a class="text-link" href={`${base}projects/`}>{strings.viewAllProjects} <span>→</span></a>
+    <a class="text-link" href={`${base}en/projects/`}>{strings.viewAllProjects} <span>→</span></a>
   </section>
 
   <section class="currently" aria-labelledby="currently-title">

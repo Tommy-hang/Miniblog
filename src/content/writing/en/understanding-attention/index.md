@@ -4,6 +4,8 @@ description: "Why Q, K, and V are simpler than they first appear."
 date: 2026-09-22
 tags:
   - AI
+featured: true
+cover: ./attention-map.svg
 ---
 
 Attention is often introduced as a wall of notation. Underneath it is a small, useful question: **what should this word notice right now?**
@@ -20,10 +22,9 @@ The familiar names describe three roles:
 
 > Attention is not memory. It is a way of deciding where to look before gathering information.
 
-<figure class="wide">
-  <img src="../../attention-map.svg" width="1200" height="560" alt="A simple diagram showing query, key, and value flowing into a weighted result" loading="lazy" />
-  <figcaption>A relationship becomes a weight; the weight decides how much information moves forward.</figcaption>
-</figure>
+![A simple diagram showing query, key, and value flowing into a weighted result](./attention-map.svg)
+
+A relationship becomes a weight; the weight decides how much information moves forward.
 
 ## The smallest useful version
 

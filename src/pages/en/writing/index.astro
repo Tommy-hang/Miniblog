@@ -1,0 +1,22 @@
+---
+import ArticleList from "../../../components/ArticleList.astro";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { t } from "../../../i18n/ui";
+import { publishedWriting } from "../../../lib/content";
+
+const locale = "en" as const;
+const strings = t(locale);
+const posts = await publishedWriting(locale);
+const base = import.meta.env.BASE_URL;
+---
+
+<BaseLayout locale={locale} title={strings.navWriting} description={strings.siteDescription} alternate={`${base}writing/`}>
+  <header class="page-header">
+    <p class="index-label">{strings.archive} · {String(posts.length).padStart(2, "0")} {strings.writingCount}</p>
+    <h1>Writing<span>.</span></h1>
+    <p>Essays and field notes about building, understanding, and paying closer attention.</p>
+  </header>
+  <section class="writing-index" aria-label={strings.writingSection}>
+    <ArticleList posts={posts} locale={locale} />
+  </section>
+</BaseLayout>
