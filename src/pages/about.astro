@@ -1,0 +1,20 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { site } from "../site";
+---
+
+<BaseLayout title="About" description="About this publication and the person behind it.">
+  <article class="about-page">
+    <header>
+      <p class="index-label">About · Index 02</p>
+      <h1>A place for<br /><em>unfinished ideas.</em></h1>
+    </header>
+    <div class="about-copy">
+      <p class="lead">Hello, I’m {site.author}. I use this space to think slowly about fast-moving things.</p>
+      <p>I’m learning how technology, design, and clear thinking come together. I care about small systems, thoughtful interfaces, and explanations that make difficult ideas easier to approach.</p>
+      <p>This publication is a record of that process—not a claim to finished expertise, but a trail of questions, experiments, and lessons learned in public.</p>
+      <h2>Elsewhere</h2>
+      <p>Follow the work and source code on <a href={site.github}>GitHub</a>.</p>
+    </div>
+  </article>
+</BaseLayout>

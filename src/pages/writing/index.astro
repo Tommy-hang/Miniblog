@@ -1,0 +1,19 @@
+---
+import { getCollection } from "astro:content";
+import ArticleList from "../../components/ArticleList.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const posts = (await getCollection("writing", ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+
+<BaseLayout title="Writing" description="Essays and notes on technology, design, and learning.">
+  <header class="page-header">
+    <p class="index-label">Archive · {String(posts.length).padStart(2, "0")} pieces</p>
+    <h1>Writing<span>.</span></h1>
+    <p>Essays and field notes about building, understanding, and paying closer attention.</p>
+  </header>
+  <section class="writing-index" aria-label="All writing">
+    <ArticleList posts={posts} />
+  </section>
+</BaseLayout>

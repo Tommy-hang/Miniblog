@@ -1,0 +1,38 @@
+---
+import type { CollectionEntry } from "astro:content";
+import BaseLayout from "./BaseLayout.astro";
+
+interface Props {
+  entry: CollectionEntry<"writing">;
+  readingTime: number;
+}
+
+const { entry, readingTime } = Astro.props;
+const { title, description, date, tags } = entry.data;
+const formattedDate = new Intl.DateTimeFormat("en", {
+  day: "2-digit",
+  month: "long",
+  year: "numeric",
+}).format(date);
+---
+
+<BaseLayout title={title} description={description} type="article">
+  <article class="article-page">
+    <header class="article-header">
+      <p class="eyebrow">
+        <span>{tags[0] ?? "Essay"}</span>
+        <time datetime={date.toISOString()}>{formattedDate}</time>
+        <span>{readingTime} min read</span>
+      </p>
+      <h1>{title}</h1>
+      <p class="article-lead">{description}</p>
+    </header>
+    <div class="article-body">
+      <slot />
+    </div>
+    <footer class="article-end">
+      <p>End note</p>
+      <a href={`${import.meta.env.BASE_URL}writing/`}>← All writing</a>
+    </footer>
+  </article>
+</BaseLayout>

@@ -1,0 +1,18 @@
+---
+import { site } from "../site";
+
+const base = import.meta.env.BASE_URL;
+const pathname = Astro.url.pathname;
+const writingPath = `${base}writing/`;
+const aboutPath = `${base}about/`;
+---
+
+<header class="site-header">
+  <a class="wordmark" href={base} aria-label={`${site.name}, home`}>
+    {site.name}<span aria-hidden="true">*</span>
+  </a>
+  <nav aria-label="Primary navigation">
+    <a href={writingPath} aria-current={pathname.startsWith(writingPath) ? "page" : undefined}>Writing</a>
+    <a href={aboutPath} aria-current={pathname === aboutPath ? "page" : undefined}>About</a>
+  </nav>
+</header>
