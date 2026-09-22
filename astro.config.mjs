@@ -12,6 +12,14 @@ export default defineConfig({
   site: process.env.SITE_URL ?? (owner ? `https://${owner}.github.io` : "https://example.com"),
   base: process.env.BASE_PATH ?? (repository && !isUserSite ? `/${repository}` : "/"),
   trailingSlash: "always",
+  markdown: {
+    // Shiki ships with Astro. Two themes, resolved entirely in CSS so the code
+    // surface can match MiniBlog's warm palette instead of a foreign editor.
+    shikiConfig: {
+      themes: { light: "github-light", dark: "github-dark" },
+      defaultColor: false,
+    },
+  },
   integrations: [
     sitemap({
       filter: (page) => {

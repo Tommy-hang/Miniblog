@@ -76,6 +76,97 @@ The content has a language.
 
 ---
 
+# 0.6 Editorial Prose System
+
+> V1.3 建立。文章页面的一切排版决策都在此约束之下。
+
+## 目标
+
+```text
+The homepage introduces the publication.
+The article proves its quality.
+```
+
+文章是 MiniBlog 最重要的页面。**阅读永远高于品牌展示。**
+
+## 三层宽度
+
+```text
+--measure-reading   阅读列（正文、列表、常规标题、脚注）
+--measure-wide      宽媒体（wide 图片、图表、宽表格、特殊 figure）
+--measure-hero      封面（cover，接近主 grid，但不 full bleed）
+```
+
+阅读列用于长时间阅读；宽媒体只是短暂突破；封面进一步接近 grid。不要使用 100vw full bleed。
+
+## 标题层级
+
+- H1 是文章最大的视觉元素（Display），但必须优雅处理长标题、2–3 行与移动端。
+- H2 是章节（Major Chapter），不是第二个 Hero。
+- H3 是局部小节（Local idea），与正文有明确区分。
+- 正文标题不使用 uppercase；uppercase 只属于 metadata。
+- 中文标题放松字距、提高行高，不继承英文的负 tracking。
+
+## 阅读节奏
+
+使用单一 `--flow` 变量驱动块间距：
+
+- 段落之间紧凑；
+- 章节前大留白，章节后小开口；
+- 图片、代码、引用、表格前后有更大的呼吸；
+- caption 紧贴图片。
+
+不要回到“所有元素统一 margin-bottom”。
+
+## 媒体层级
+
+```text
+默认图片   ![alt](./image.webp)           无边框，图片自己决定边界
+宽图       ![alt](./image.webp "wide")    轻微突破阅读列
+带框图片   ![alt](./image.webp "frame")   截图类需要 hairline 时使用
+封面       cover: ./cover.webp            frontmatter，出现在标题之后
+Caption    图片下一行的斜体段落            *图 1 — 说明。*
+```
+
+- 不强制所有图片加 border；圆角保持 0 或极小。
+- cover 不等于正文第一张图；示例内容不要重复。
+- 图片必须 responsive、有尺寸、防 CLS、alt 正确。
+
+## 代码
+
+- 使用 Astro 内置 Shiki 静态高亮，不引入客户端高亮。
+- light / dark 双主题，通过 CSS 变量切换；代码表面使用 MiniBlog 自己的暖色 token（`--color-code`），而不是外部编辑器主题的背景。
+- `pre` 必须 `overflow-x: auto`；移动端不撑破 viewport。
+- 不增加 copy button、行号、文件名 tabs。
+
+## 表格
+
+- 桌面为编辑式表格：清晰表头、克制的分隔线、足够的单元格间距。
+- 窄屏让表格自身横向滚动，页面 viewport 不横向滚动。
+- 保持语义 `<table>`。
+
+## 脚注
+
+- 使用 Markdown 原生脚注。
+- 低调：较小字号、较低对比、顶部 separator、可点击的引用编号与回链。
+
+## 数学公式
+
+V1.3 不引入数学公式渲染（避免为它引入 runtime 依赖）。列为 future enhancement。
+
+## Responsive 哲学
+
+- Mobile 是重新排版，不是压缩桌面版。
+- 阅读列在 mobile 接近 viewport，但保留舒适边距。
+- 中文长标题自然换行，不出现“一屏 5 个字”。
+- 至少检查 360 / 390 / 768 / 1024 / 1440+。
+
+## 作者体验
+
+普通作者只需要 Markdown + frontmatter + 图片。`wide` / `frame` / caption 都是可选的极轻约定，不是必须。`.md` 仍是主要格式，不要 MDX-first。
+
+---
+
 # 1. MiniBlog 是什么
 
 MiniBlog 是一个面向个人创作者、技术学习者和长期写作者的现代个人博客。

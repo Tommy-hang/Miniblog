@@ -25,9 +25,9 @@ export interface ContentStrings {
   readingTime: (min: number) => string;
   published: string;
   updated: string;
+  written: string;
   allWriting: string;
   allProjects: string;
-  endNote: string;
   visitRepo: string;
   visitDemo: string;
   essay: string;
@@ -38,9 +38,9 @@ const zh: ContentStrings = {
   readingTime: (min: number) => `约 ${min} 分钟`,
   published: "发布于",
   updated: "更新于",
+  written: "写于",
   allWriting: "← 所有文章",
   allProjects: "← 所有项目",
-  endNote: "全文完",
   visitRepo: "源代码",
   visitDemo: "在线预览",
   essay: "随笔",
@@ -51,9 +51,9 @@ const en: ContentStrings = {
   readingTime: (min: number) => `${min} min read`,
   published: "Published",
   updated: "Updated",
+  written: "Written",
   allWriting: "← All writing",
   allProjects: "← All projects",
-  endNote: "End note",
   visitRepo: "Source",
   visitDemo: "Live demo",
   essay: "Essay",

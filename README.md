@@ -6,7 +6,7 @@
 
 MiniBlog 是一个使用 Astro 构建的现代个人出版物，也是一次关于“优秀体验究竟需要多少复杂度”的长期实验。
 
-V1 建立了视觉与工程基础，V1.1 建立了内容基础。**V1.2 — Editorial Cleanup** 做的是精修：修正错误的抽象、删除不必要的复杂度、让已有系统更完整。
+V1 建立了视觉与工程基础，V1.1 建立了内容基础，V1.2 清理了语言模型与复杂度。**V1.3 — Editorial Prose & Media** 只专注一件事：让文章本身值得认真坐下来阅读。
 
 ```text
 Code defines the publishing system.
@@ -45,16 +45,22 @@ LOCAL MEDIA            Markdown + images
 STATIC SYSTEM          Astro
 ```
 
-## V1.2 包含什么
+## V1.3 包含什么
 
+- **Editorial Prose System**：一套共享的阅读排版系统，Writing 与 Projects 复用同一套正文
+- **三层宽度**：阅读列（`--measure-reading`）、宽媒体（`--measure-wide`）、封面（`--measure-hero`）
+- **真正的阅读节奏**：段落之间紧凑，章节、图片与分隔线之间留出呼吸
+- **克制的标题层级**：H2 是章节，不再像第二个 Hero；H3 是局部小节
+- **媒体层级**：普通图片、`wide` 宽图、`cover` 封面，以及图片下方的 caption
+- **代码与主题一体**：Shiki 静态高亮，light / dark 双主题，落在 MiniBlog 自己的暖色表面上
+- **表格**：桌面为编辑式表格，窄屏自动横向滚动，不会撑破页面
+- **脚注**：原生 Markdown 脚注，低调的引用编号与回链
+- **中文与英文分别设计的排版**：中文放松字距、提高行高；英文保留更紧的 display tracking
 - **单一品牌页面**：只有一个首页 `/`、一个 `/writing/`、一个 `/projects/`、一个 `/about/`
 - **内容路由保留语言前缀**：中文在 `/writing/<slug>/`，英文在 `/en/writing/<slug>/`；项目同理
 - **混合语言归档**：Writing 与 Projects 归档同时按日期倒序展示两种语言的内容，并标注 `ZH` / `EN`
 - **翻译对应**：同 slug 的 zh / en 内容自动互相关联；详情页出现克制的语言链接，且只认已发布（非 draft）的翻译
 - **内容包（Content Bundle）**：Markdown 与图片放在同一个文件夹里，构建期自动优化
-- **中文与英文分别设计的排版**：中文放松字距、提高行高；英文保留更紧的 display tracking
-- **图片三层层级**：普通图片、`wide` 宽图、`cover` 封面
-- **项目在移动端的视觉标识**：桌面为 hover 浮动预览，触屏与窄屏为行内宽幅图片
 - **内容驱动首页**：`featured: true` 自动进入精选区域，无精选时回退到最新内容
 - 构建期阅读时间（中文按字数、英文按词数）、双语 RSS、draft 过滤、Sitemap、完整 SEO
 - **零客户端 JavaScript**，**没有新增任何依赖**
@@ -176,11 +182,43 @@ demo: https://...              # 可选
 
 ---
 
+## 写出更丰富的文章
+
+文章仍然是普通 Markdown，日常写作不需要任何组件：
+
+```md
+## 一个章节
+
+普通段落，可以包含 `inline code`、[链接](https://example.com) 和 **强调**。
+
+![普通图片](./diagram.webp)
+```
+
+需要时，用很少的约定就能获得更丰富的呈现：
+
+- **封面**：frontmatter 里写 `cover: ./cover.webp`，显示在标题下方、比正文更宽。
+- **宽图**：给图片加 `"wide"`，轻微突破正文列宽 —— `![宽图](./diagram.webp "wide")`。
+- **Caption**：在图片下一行写一条斜体说明，它会被渲染成图注：
+
+  ```md
+  ![流程图](./flow.webp)
+  *图 1 — 数据如何流动。*
+  ```
+
+- **带细边框的图**：截图类图片用 `"frame"`，可与 `wide` 组合，如 `"wide frame"`。
+- **脚注**：使用标准 Markdown 脚注语法 `[^1]`。
+- **表格与代码**：直接写 Markdown 表格与围栏代码块即可，无需额外配置。
+
+`wide` / `frame` 只是图片 title 里的关键字，可以自由组合。普通文章完全不使用它们，也已经足够漂亮。
+
+---
+
 ## 修改身份与设计
 
 - `src/site.ts` — 博客名称、作者、GitHub、所在地，以及首页 `Currently`（作者自己的话，可以用中文）。
 - `src/i18n/ui.ts` — 只保存**随内容语言变化**的文案（如阅读时间、发布/更新、返回索引）。品牌界面文案直接写在组件里，固定英文。
 - `src/styles/global.css` 顶部 — 颜色、字体、间距、动效曲线等 Design Tokens。`:lang(zh)` 段落是中文排版规则。
+- `src/styles/prose.css` — Editorial Prose System：阅读宽度、标题层级、节奏、图片、代码、表格、脚注。
 - `public/favicon.svg` 与 `public/social-card.svg` — 品牌资产。
 
 ## 项目结构
@@ -196,7 +234,8 @@ src/
 ├── lib/content.ts          locale/slug/过滤/排序/阅读时间/翻译匹配
 ├── layouts/                BaseLayout 与 ArticleLayout（文章和项目共用）
 ├── pages/                  单一品牌页面 + 语言前缀的内容详情页、RSS、重定向
-├── styles/global.css       完整视觉系统（含中文排版规则）
+├── styles/global.css       站点外观（tokens、布局、导航、首页、页脚）
+├── styles/prose.css        Editorial Prose System（文章阅读与 Markdown 排版）
 ├── content.config.ts       writing / projects 两个 Collection 的 Schema
 └── site.ts                 博客身份信息
 .github/workflows/          GitHub Pages 部署
@@ -227,7 +266,7 @@ astro.config.mjs            构建、部署路径、Sitemap 过滤
 3. `src/i18n/ui.ts` — 为什么只有内容级文案需要语言
 4. `src/pages/writing/[slug].astro` — 内容如何变成页面
 5. `src/layouts/ArticleLayout.astro` — 文章与项目如何共享一个版式
-6. `src/styles/global.css` — 视觉系统（重点看 `:lang(zh)` 规则）
+6. `src/styles/prose.css` — Editorial Prose System（文章阅读与 Markdown 排版）
 7. `src/pages/rss.xml.ts` — 同一份内容如何成为 RSS
 8. `astro.config.mjs` — 构建与部署需要多少配置
 
@@ -243,7 +282,7 @@ astro.config.mjs            构建、部署路径、Sitemap 过滤
 
 ## 刻意没有实现什么
 
-V1.2 没有搜索、评论、CMS、登录、数据库、Analytics、AI 助手、标签页、Series、相关文章算法、摄影画廊、Lightbox、前端框架、Tailwind 或动画库。中文与英文都使用高质量系统字体栈，没有引入任何 Web Font。
+V1.3 没有搜索、评论、CMS、登录、数据库、Analytics、AI 助手、标签页、Series、相关文章算法、摄影画廊、Lightbox、前端框架、Tailwind、动画库或客户端语法高亮。中文与英文都使用高质量系统字体栈，没有引入任何 Web Font。
 
 这不意味着这些功能永远不应该存在。它意味着在真实需求出现之前，不提前支付它们的复杂度成本。
 
@@ -268,7 +307,7 @@ MiniBlog is a modern personal publication built with Astro and a long-term exper
 
 > **How little technical complexity does an excellent digital reading experience actually require?**
 
-V1 built the visual and engineering foundation, V1.1 built the content foundation. **V1.2 — Editorial Cleanup** refines both: it fixes incorrect abstractions, removes unnecessary complexity, and makes the existing system feel intentional.
+V1 built the visual and engineering foundation, V1.1 built the content foundation, V1.2 cleaned up the language model and the complexity. **V1.3 — Editorial Prose & Media** focuses on one thing: making the article itself worth sitting down to read.
 
 ## Brand Language ≠ Content Language
 
@@ -282,16 +321,22 @@ This is the central idea of V1.2, and a constraint for every future version.
 
 So MiniBlog is not two mirrored sites. It is one publication with an English editorial shell and multilingual content.
 
-## What V1.2 includes
+## What V1.3 includes
 
+- **Editorial Prose System**: one shared reading system, reused by both Writing and Projects
+- **Three structural widths**: reading (`--measure-reading`), wide media (`--measure-wide`), and cover (`--measure-hero`)
+- **Real reading rhythm**: paragraphs stay tight, while chapters, media, and rules get breathing room
+- **A restrained heading hierarchy**: H2 is a chapter, no longer a second hero; H3 is a local idea
+- **A media hierarchy**: default image, `wide`, `cover`, and captions
+- **Code that belongs to the theme**: static Shiki highlighting with light / dark themes on MiniBlog's own warm surface
+- **Tables**: editorial on wide screens, horizontally scrollable on narrow ones — the page never overflows
+- **Footnotes**: native Markdown footnotes with quiet references and backlinks
+- **Typography designed separately** for Chinese and English
 - **One set of brand pages**: a single `/`, `/writing/`, `/projects/`, and `/about/`
 - **Language-prefixed content routes**: Chinese at `/writing/<slug>/`, English at `/en/writing/<slug>/`; the same for projects
 - **Mixed-language archives**: Writing and Projects list both languages by date, labelled `ZH` / `EN`
 - **Translation pairing** by matching slug, with a restrained detail-page link that only trusts published translations
 - **Content bundles**: Markdown and images live together and are optimized at build time
-- **Typography designed separately** for Chinese and English
-- **Three image levels**: default, `wide`, and `cover`
-- **A real mobile identity for Projects**: a floating hover preview on pointer devices, an inline wide strip on touch and narrow screens
 - **Content-driven homepage**: `featured: true` drives the selected sections, falling back to the latest content
 - Build-time reading time, bilingual RSS, draft filtering, sitemap, full SEO
 - **Zero client-side JavaScript**, with **no new dependencies**
@@ -323,11 +368,41 @@ tags:
 ---
 ```
 
+## Writing rich articles
+
+Articles are still plain Markdown, and everyday writing needs no components:
+
+```md
+## A section
+
+A paragraph with `inline code`, a [link](https://example.com), and **emphasis**.
+
+![A default image](./diagram.webp)
+```
+
+A few small conventions unlock richer presentation when you need it:
+
+- **Cover**: set `cover: ./cover.webp` in frontmatter — it appears below the title, wider than the reading column.
+- **Wide image**: add `"wide"` to break gently out of the reading column — `![Wide](./diagram.webp "wide")`.
+- **Caption**: put an italic line directly after an image and it becomes the caption:
+
+  ```md
+  ![A diagram](./flow.webp)
+  *Fig. 01 — How the data flows.*
+  ```
+
+- **Framed image**: add `"frame"` for screenshots, optionally combined — `"wide frame"`.
+- **Footnotes**: standard Markdown `[^1]` syntax.
+- **Tables and code**: plain Markdown tables and fenced code blocks, with no configuration.
+
+`wide` / `frame` are just keywords in the image title and can be combined freely. Articles that never use them are already beautiful.
+
 ## Customize and deploy
 
 - `src/site.ts` — publication identity and the homepage `Currently` list (in any content language).
 - `src/i18n/ui.ts` — only the strings that follow the content language; brand copy is fixed English in the components.
-- `src/styles/global.css` — design tokens; the `:lang(zh)` block holds the Chinese typography rules.
+- `src/styles/global.css` — design tokens and site chrome; the `:lang(zh)` block holds the Chinese typography rules.
+- `src/styles/prose.css` — the Editorial Prose System: reading width, heading hierarchy, rhythm, media, code, tables, and footnotes.
 
 To deploy, open **Settings → Pages**, choose **GitHub Actions**, and push to `main`. The included workflow handles base paths for both user sites and project sites.
 

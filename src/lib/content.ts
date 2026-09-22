@@ -102,6 +102,14 @@ export function formatDate(date: Date, locale: Locale): string {
   }).format(date);
 }
 
+/** "September 2026" / "2026年9月" — the quiet colophon signature. */
+export function formatMonthYear(date: Date, locale: Locale): string {
+  return new Intl.DateTimeFormat(locale === "zh" ? "zh-CN" : "en", {
+    month: "long",
+    year: "numeric",
+  }).format(date);
+}
+
 /** "SEP 22, 2026" — one English editorial label for every archive row. */
 export function formatIndexDate(date: Date): string {
   return new Intl.DateTimeFormat("en", { day: "2-digit", month: "short", year: "numeric" })

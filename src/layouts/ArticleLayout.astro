@@ -2,7 +2,7 @@
 import { Image } from "astro:assets";
 import BaseLayout from "./BaseLayout.astro";
 import { contentStrings, type Locale } from "../i18n/ui";
-import { formatDate, type ContentEntry } from "../lib/content";
+import { formatDate, formatMonthYear, type ContentEntry } from "../lib/content";
 
 interface Props {
   entry: ContentEntry;
@@ -17,6 +17,7 @@ const strings = contentStrings(locale);
 const kind = entry.collection === "writing" ? "writing" : "projects";
 const backHref = `${import.meta.env.BASE_URL}${kind}/`;
 const backLabel = kind === "writing" ? strings.allWriting : strings.allProjects;
+const project = entry.collection === "projects" ? entry.data : undefined;
 ---
 
 <BaseLayout locale={locale} title={title} description={description} type="article" alternate={alternate}>
@@ -24,7 +25,7 @@ const backLabel = kind === "writing" ? strings.allWriting : strings.allProjects;
     <header class="article-header">
       <p class="eyebrow">
         <span>{kind === "writing" ? (tags[0] ?? strings.essay) : (tags[0] ?? strings.piece)}</span>
-        {entry.collection === "projects" && "status" in entry.data && entry.data.status && <span>{entry.data.status}</span>}
+        {project?.status && <span>{project.status}</span>}
         <time datetime={date.toISOString()}>{formatDate(date, locale)}</time>
         <span>{strings.readingTime(readingTime)}</span>
         {alternate && (
@@ -45,20 +46,28 @@ const backLabel = kind === "writing" ? strings.allWriting : strings.allProjects;
           {strings.published} {formatDate(date, locale)} · {strings.updated} {formatDate(updated, locale)}
         </p>
       )}
-      {cover && <Image class="article-cover" src={cover} alt={title} widths={[960, 1440]} sizes="(min-width: 60rem) 56rem, 100vw" />}
     </header>
+    {cover && (
+      <div class="article-hero">
+        <Image
+          class="article-cover"
+          src={cover}
+          alt={title}
+          widths={[960, 1440]}
+          sizes="(min-width: 72rem) 72rem, 100vw"
+        />
+      </div>
+    )}
     <div class="article-body">
       <slot />
     </div>
     <footer class="article-end">
-      <p>{strings.endNote}</p>
-      {entry.collection === "projects" && ("repo" in entry.data || "demo" in entry.data) && (
-        <span class="article-links">
-          {"repo" in entry.data && entry.data.repo && <a href={entry.data.repo}>{strings.visitRepo} ↗</a>}
-          {"demo" in entry.data && entry.data.demo && <a href={entry.data.demo}>{strings.visitDemo} ↗</a>}
-        </span>
-      )}
-      <a href={backHref}>{backLabel}</a>
+      <p class="article-signature">{strings.written} {formatMonthYear(date, locale)}</p>
+      <span class="article-links">
+        {project?.repo && <a href={project.repo}>{strings.visitRepo} ↗</a>}
+        {project?.demo && <a href={project.demo}>{strings.visitDemo} ↗</a>}
+        <a href={backHref}>{backLabel}</a>
+      </span>
     </footer>
   </article>
 </BaseLayout>

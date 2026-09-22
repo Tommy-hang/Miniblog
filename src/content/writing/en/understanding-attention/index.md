@@ -5,7 +5,6 @@ date: 2026-09-22
 tags:
   - AI
 featured: true
-cover: ./attention-map.svg
 ---
 
 Attention is often introduced as a wall of notation. Underneath it is a small, useful question: **what should this word notice right now?**

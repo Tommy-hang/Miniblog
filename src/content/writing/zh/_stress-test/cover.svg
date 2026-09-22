@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 560">
+  <rect width="1200" height="560" fill="#e9e4da"/>
+  <g fill="none" stroke="#1d1d1a" stroke-width="2">
+    <circle cx="190" cy="280" r="74"/><circle cx="600" cy="160" r="74"/><circle cx="600" cy="400" r="74"/><circle cx="1010" cy="280" r="74"/>
+    <path d="M264 265 526 175M264 295l262 90M674 175l262 90M674 385l262-90"/>
+  </g>
+  <g font-family="Arial,sans-serif" text-anchor="middle" fill="#1d1d1a">
+    <text x="190" y="288" font-size="28">QUERY</text><text x="600" y="168" font-size="28">KEY</text><text x="600" y="408" font-size="28">VALUE</text><text x="1010" y="288" font-size="28">CONTEXT</text>
+  </g>
+  <circle cx="600" cy="280" r="10" fill="#d84a32"/>
+</svg>

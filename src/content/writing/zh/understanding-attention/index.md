@@ -5,7 +5,6 @@ date: 2026-09-22
 tags:
   - AI
 featured: true
-cover: ./attention-map.svg
 ---
 
 注意力机制（Attention）经常被一堵记号之墙介绍出来。但剥开表面，它只是在回答一个很小、很有用的问题：**此刻这个词应该注意到什么？**
