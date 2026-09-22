@@ -1,6 +1,6 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 import type { Locale } from "../i18n/ui";
-import { tags } from "./tags";
+import { tags, type Tag } from "./tags";
 
 export type WritingEntry = CollectionEntry<"writing">;
 export type ProjectEntry = CollectionEntry<"projects">;
@@ -169,8 +169,11 @@ export function groupWritingByYear(entries: WritingEntry[]): WritingYearGroup[] 
   }));
 }
 
-/** Registry-ordered tag names that at least one entry actually uses. */
-export function tagsInUse(entries: ContentEntry[]): string[] {
+/**
+ * Registry-ordered tags that at least one entry actually uses, returned as
+ * registry objects so callers can read `slug` without a second lookup.
+ */
+export function tagsInUse(entries: ContentEntry[]): Tag[] {
   const used = new Set(entries.flatMap((entry) => entry.data.tags));
-  return tags.filter((tag) => used.has(tag.name)).map((tag) => tag.name);
+  return tags.filter((tag) => used.has(tag.name));
 }

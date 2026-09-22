@@ -86,7 +86,8 @@ npm run dev
 生产检查与预览：
 
 ```bash
-npm run build   # 包含 astro check
+npm run check    # astro check（类型与内容 schema）
+npm run build    # 包含 astro check，并生成静态站点
 npm run preview
 ```
 
@@ -384,7 +385,7 @@ npm install
 npm run dev
 ```
 
-Validate and preview the production build with `npm run build` (includes `astro check`) and `npm run preview`.
+Validate types and content schemas with `npm run check`, then build and preview with `npm run build` and `npm run preview`.
 
 ## Publish content
 
