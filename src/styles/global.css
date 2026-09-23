@@ -36,10 +36,12 @@
   --font-sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Source Han Sans SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
   --font-serif: Iowan Old Style, Baskerville, "Times New Roman", serif;
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
-  /* Three structural widths: reading, wide media, hero media. */
+  /* Structural widths: reading, wide media, hero media, and the full page row. */
   --measure-reading: 44rem;
   --measure-wide: min(64rem, calc(100vw - 3rem));
   --measure-hero: min(100%, 72rem);
+  --shell-gutter: clamp(2rem, 7vw, 7.5rem);
+  --measure-shell: min(100vw - var(--shell-gutter), 96rem);
   --space-1: 0.5rem;
   --space-2: 0.75rem;
   --space-3: 1rem;
@@ -131,7 +133,7 @@ em { font-family: var(--font-serif); font-weight: 400; }
 
 /* 4. Layout */
 .page-shell {
-  width: min(100% - clamp(2rem, 7vw, 7.5rem), 96rem);
+  width: min(100% - var(--shell-gutter), 96rem);
   margin-inline: auto;
 }
 main { min-height: 70vh; }
@@ -458,33 +460,8 @@ a:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 5px; }
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
 }
 
-/* 12. Archive masthead — the Writing and Projects titles are centered and
- * span the full row. Kept last so they win over the generic .page-header rules
- * at every width. */
-.page-header--display { display: grid; align-items: center; container-type: inline-size; }
-.page-header--display .index-label { grid-column: 1 / 13; grid-row: 1; align-self: end; justify-self: center; }
-.page-header--display h1 {
-  grid-column: 1 / 13;
-  grid-row: 2;
-  margin: var(--space-5) 0 0;
-  text-align: center;
-  /* cqw scales with the row itself, not the viewport, so the title fills the
-   * line at every width and stops growing once the shell reaches its cap. */
-  font-size: clamp(2.5rem, 28cqw, 27rem);
-  line-height: 1;
-  letter-spacing: -0.05em;
-  /* A tight display line lets the descender overflow its box by ~0.15em;
-   * this em-based padding keeps it clear of the description at any size. */
-  padding-block-end: 0.2em;
-}
-.page-header--display > p:last-child {
-  grid-column: 1 / 13;
-  grid-row: 3;
-  justify-self: center;
-  max-width: 44rem;
-  margin: var(--space-5) 0 0;
-  text-align: center;
-}
+/* The header carries one extra control; tighten the rhythm on narrow screens
+ * so the wordmark, navigation and theme toggle all fit on one line. */
 @media (max-width: 38rem) {
   .site-header { font-size: 0.68rem; letter-spacing: 0.08em; gap: 0.7rem; }
   .site-header-end { gap: 0.9rem; }

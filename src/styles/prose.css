@@ -66,9 +66,10 @@
 :lang(zh) .article-body { line-height: 1.92; letter-spacing: 0.01em; }
 .article-body > * { margin-block: 0; }
 .article-body > * + * { margin-block-start: var(--flow, 1.35em); }
+.article-body > h1 { --flow: 3em; }
 .article-body > h2 { --flow: 2.6em; }
 .article-body > h3 { --flow: 2em; }
-.article-body > h2 + *, .article-body > h3 + * { --flow: 0.9em; }
+.article-body > h1 + *, .article-body > h2 + *, .article-body > h3 + * { --flow: 0.9em; }
 .article-body > ul, .article-body > ol { --flow: 1.25em; }
 .article-body > pre { --flow: 1.9em; }
 .article-body > blockquote { --flow: 1.9em; }
@@ -78,6 +79,14 @@
 .article-body > hr { --flow: 3.2em; }
 
 /* 4. Headings — chapters, not second heroes. */
+/* A `#` heading inside the body is a major section title: it breaks out of the
+ * reading column, spans the full page row, and is centered. */
+.article-body h1 {
+  width: var(--measure-shell);
+  max-width: none;
+  margin-inline: calc((100% - var(--measure-shell)) / 2);
+  text-align: center;
+}
 .article-body h2 {
   font-size: clamp(1.7rem, 2.8vw, 2.35rem);
   line-height: 1.2;

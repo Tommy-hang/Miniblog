@@ -95,6 +95,7 @@ draft: true
 - `title` / `description` / `date` 必填（`description` 对 Archive、SEO、首页都很重要）。
 - `tags` 可选，受控词表。
 - `draft` / `featured` 默认 false；`updated` / `cover` 可选。
+- 正文里的 `#` 标题会渲染成**居中、占满整行**的章节大标题；`##` / `###` 保持左对齐的小节样式。
 
 ### 目录即语言与 URL
 
@@ -380,6 +381,8 @@ src/content/writing/en/<slug>/index.md   →  /en/writing/<slug>/
 ```
 
 The same slug under both locales is a translation pair. Projects work the same way.
+
+A `#` heading inside the article body renders as a **centered, full-width** section title; `##` and `###` keep their usual left-aligned subsection style.
 
 ## Images
 
