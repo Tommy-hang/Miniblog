@@ -8,25 +8,16 @@
 /* 1. Tokens */
 :root {
   color-scheme: light dark;
-  /* Light values are the fallback; light-dark() resolves against color-scheme. */
+  /* Light palette — exactly as V1.5.2. */
   --color-background: #f3f0e9;
-  --color-background: light-dark(#f3f0e9, #171714);
   --color-surface: #e9e4da;
-  --color-surface: light-dark(#e9e4da, #22221e);
   --color-code: #e7e1d3;
-  --color-code: light-dark(#e7e1d3, #201f1b);
   --color-text: #1d1d1a;
-  --color-text: light-dark(#1d1d1a, #eeeae1);
   --color-text-secondary: #5f5d57;
-  --color-text-secondary: light-dark(#5f5d57, #aaa79f);
   --color-text-tertiary: #89867e;
-  --color-text-tertiary: light-dark(#89867e, #77756f);
   --color-border: #c9c4b9;
-  --color-border: light-dark(#c9c4b9, #3b3a35);
   --color-accent: #d84a32;
-  --color-accent: light-dark(#d84a32, #f06a4e);
   --color-selection: #f0a493;
-  --color-selection: light-dark(#f0a493, #793829);
   /*
    * No web font is shipped. The first entry is a real system family rather
    * than a phantom "Inter" that never loads, so the declared stack is honest
@@ -55,10 +46,38 @@
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* A manual choice overrides the system default. `data-theme` is set before
- * paint by a tiny inline script in <head>, and updated by the header toggle. */
+/*
+ * Dark palette — exactly as V1.5.2. It follows the system by default; the
+ * header toggle can pin either mode, so the same values also apply when
+ * `data-theme="dark"` is set.
+ */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --color-background: #171714;
+    --color-surface: #22221e;
+    --color-code: #201f1b;
+    --color-text: #eeeae1;
+    --color-text-secondary: #aaa79f;
+    --color-text-tertiary: #77756f;
+    --color-border: #3b3a35;
+    --color-accent: #f06a4e;
+    --color-selection: #793829;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-background: #171714;
+  --color-surface: #22221e;
+  --color-code: #201f1b;
+  --color-text: #eeeae1;
+  --color-text-secondary: #aaa79f;
+  --color-text-tertiary: #77756f;
+  --color-border: #3b3a35;
+  --color-accent: #f06a4e;
+  --color-selection: #793829;
+}
 :root[data-theme="light"] { color-scheme: light; }
-:root[data-theme="dark"] { color-scheme: dark; }
 
 /* 2. Reset / base */
 *, *::before, *::after { box-sizing: border-box; }

@@ -241,7 +241,7 @@ git push origin main
 
 ### 亮/暗模式
 
-Header 右侧有一个安静的亮/暗切换：**默认跟随系统**（`prefers-color-scheme`），手动点一下会覆盖并记住选择。它是一段约十行的内联脚本 + 现代 CSS `light-dark()`，没有依赖、没有框架。两种模式在移动端和桌面端都已设计。
+Header 右侧有一个安静的亮/暗切换：**默认跟随系统**（`prefers-color-scheme`），手动点一下会覆盖并记住选择。它是一段约十行的内联脚本 + 一组 `data-theme` 颜色变量，没有依赖、没有框架。两种模式在移动端和桌面端都已设计。
 
 ## 项目结构
 
@@ -484,7 +484,7 @@ git push origin main
 
 ### Light / dark mode
 
-The header carries a quiet light/dark toggle. It **follows the system** (`prefers-color-scheme`) by default; clicking it pins a manual choice that is remembered. It is a ~10-line inline script plus modern CSS `light-dark()` — no dependency, no framework. Both modes are designed for mobile and desktop.
+The header carries a quiet light/dark toggle. It **follows the system** (`prefers-color-scheme`) by default; clicking it pins a manual choice that is remembered. It is a ~10-line inline script plus a small `data-theme` colour override — no dependency, no framework. Both modes are designed for mobile and desktop.
 
 ## Deploy
 
