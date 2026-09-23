@@ -146,7 +146,7 @@ async function main() {
   for (const file of changed) console.log(`  ${file}`);
 
   console.log("\nVerifying...\n");
-  const verify = spawnSync("npm", ["run", "verify"], { cwd: ROOT, stdio: "inherit", shell: true });
+  const verify = spawnSync("npm run verify", { cwd: ROOT, stdio: "inherit", shell: true });
   if (verify.status !== 0) {
     cancel("Publish stopped.\n\nVerification failed.\nNothing was committed or pushed.\n\nFix the errors above and run:\n\n  npm run publish");
   }
