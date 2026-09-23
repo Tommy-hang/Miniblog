@@ -30,18 +30,7 @@ import {
   validateTagName,
 } from "./content-utils.mjs";
 
-const { ask, confirm, close } = createPrompter();
-
-async function choose(question, options) {
-  console.log(`\n${question}`);
-  options.forEach((option, index) => console.log(`  ${index + 1}. ${option.label}`));
-  for (;;) {
-    const answer = await ask("> ");
-    const index = Number(answer) - 1;
-    if (Number.isInteger(index) && index >= 0 && index < options.length) return options[index].value;
-    console.log(`Please enter a number between 1 and ${options.length}.`);
-  }
-}
+const { ask, confirm, choose, close } = createPrompter();
 
 async function askTitle() {
   for (;;) {

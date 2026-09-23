@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 /**
- * Publish content: verify, then commit and push only `src/content/**`.
+ * Publish author changes: verify, then commit and push only `src/content/**`
+ * and `src/lib/tags.ts`.
  *
  * This is an author tool, not a deployment tool. It refuses to run unless the
- * working tree contains content changes and nothing else, never stages
+ * working tree contains author changes and nothing else, never stages
  * developer files, never force-pushes, and never publishes a draft without an
  * explicit confirmation. It reuses `npm run verify` rather than reimplementing
  * any checks.
@@ -18,8 +19,16 @@ import {
   parseFrontmatter,
 } from "./content-utils.mjs";
 
+/** Author Workflow may only publish content and the controlled tag registry. */
+const AUTHOR_PATHS = ["src/content/", "src/lib/tags.ts"];
 const CONTENT_PREFIX = "src/content/";
+const TAGS_PATH = "src/lib/tags.ts";
 const prompter = createPrompter();
+
+const isAuthorChange = (file) => {
+  const rel = file.replaceAll("\\", "/");
+  return AUTHOR_PATHS.some((prefix) => (prefix.endsWith("/") ? rel.startsWith(prefix) : rel === prefix));
+};
 
 class Cancelled extends Error {}
 const cancel = (message) => {
@@ -59,7 +68,8 @@ function setDraftFalse(file) {
   writeFileSync(file, updated, "utf8");
 }
 
-function commitMessage(items) {
+function commitMessage(items, tagsChanged) {
+  if (items.length === 0) return "Tags: update registry";
   if (items.length === 1) {
     const item = items[0];
     return item.collection === "writing" ? `Publish: ${item.title}` : `Publish project: ${item.title}`;
@@ -93,10 +103,12 @@ async function main() {
     return;
   }
 
-  const nonContent = changed.filter((file) => !file.replaceAll("\\", "/").startsWith(CONTENT_PREFIX));
-  if (nonContent.length > 0) {
-    cancel(`Publish cancelled.\n\nNon-content changes were detected:\n\n${nonContent.map((file) => `  ${file}`).join("\n")}\n\nnpm run publish is intentionally content-only.\nCommit developer changes separately, then run npm run publish again.`);
+  const nonAuthor = changed.filter((file) => !isAuthorChange(file));
+  if (nonAuthor.length > 0) {
+    cancel(`Publish cancelled.\n\nNon-author changes were detected:\n\n${nonAuthor.map((file) => `  ${file}`).join("\n")}\n\nnpm run publish only manages content and the tag registry.\nCommit other changes separately, then run npm run publish again.`);
   }
+
+  const tagsChanged = changed.some((file) => file.replaceAll("\\", "/") === TAGS_PATH);
 
   const filesByUnit = new Map();
   for (const entry of listContent()) {
@@ -142,6 +154,7 @@ async function main() {
     console.log(`  ${kind} · ${item.title}`);
     console.log(`  ${item.locale} · ${item.slug}`);
   }
+  if (tagsChanged) console.log("  Tag registry updated");
   console.log(`\nFiles changed (${changed.length}):`);
   for (const file of changed) console.log(`  ${file}`);
 
@@ -151,11 +164,12 @@ async function main() {
     cancel("Publish stopped.\n\nVerification failed.\nNothing was committed or pushed.\n\nFix the errors above and run:\n\n  npm run publish");
   }
 
-  const confirmed = await prompter.confirm("\nVerification passed.\n\nPublish to GitHub?", items.length === 1);
+  const defaultYes = items.length === 1 && !tagsChanged;
+  const confirmed = await prompter.confirm("\nVerification passed.\n\nPublish to GitHub?", defaultYes);
   if (!confirmed) cancel("Publish cancelled.\nNothing was committed or pushed.");
 
-  git(["add", "-A", "--", "src/content"]);
-  git(["commit", "-m", commitMessage(items)]);
+  git(["add", "-A", "--", "src/content", "src/lib/tags.ts"]);
+  git(["commit", "-m", commitMessage(items, tagsChanged)]);
   console.log("\nCommitted locally.");
 
   const push = spawnSync("git", ["push", "origin", "main"], { cwd: ROOT, stdio: "inherit" });

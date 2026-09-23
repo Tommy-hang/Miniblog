@@ -72,6 +72,28 @@ export function registerTag(name, slug) {
   writeFileSync(TAGS_FILE, updated, "utf8");
 }
 
+/**
+ * Removes one entry from `src/lib/tags.ts`, the single tag registry.
+ *
+ * It matches the exact entry line and refuses unless the slug appears exactly
+ * once, so comments, order, types and file format stay untouched.
+ */
+export function removeTag(slug) {
+  const source = readFileSync(TAGS_FILE, "utf8");
+  const safe = slug.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const pattern = new RegExp(
+    `^[ \\t]*\\{\\s*name:\\s*"[^"]*",\\s*slug:\\s*"${safe}"\\s*\\},[ \\t]*\\r?\\n`,
+    "gm",
+  );
+  const matches = [...source.matchAll(pattern)];
+  if (matches.length !== 1) {
+    throw new Error("Could not safely update src/lib/tags.ts. No changes were made.");
+  }
+  const [match] = matches;
+  const updated = source.slice(0, match.index) + source.slice(match.index + match[0].length);
+  writeFileSync(TAGS_FILE, updated, "utf8");
+}
+
 /** "Understanding Attention" → "understanding-attention"; non-ASCII → "". */
 export function slugify(title) {
   if (/[^\x00-\x7F]/.test(title)) return "";
@@ -247,6 +269,18 @@ export function createPrompter() {
     }
   }
 
-  return { ask, confirm, close: () => rl.close() };
+  /** Numbered menu. Returns the chosen option's value. */
+  async function choose(question, options) {
+    console.log(`\n${question}`);
+    options.forEach((option, index) => console.log(`  ${index + 1}. ${option.label}`));
+    for (;;) {
+      const answer = await ask("> ");
+      const index = Number(answer) - 1;
+      if (Number.isInteger(index) && index >= 0 && index < options.length) return options[index].value;
+      console.log(`Please enter a number between 1 and ${options.length}.`);
+    }
+  }
+
+  return { ask, confirm, choose, close: () => rl.close() };
 }
 

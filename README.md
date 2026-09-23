@@ -34,10 +34,11 @@ npm install
 npm run dev
 ```
 
-日常只需要记住三个命令：
+日常只需要记住四个命令：
 
 ```text
 npm run new      创建内容
+npm run remove   删除内容 / 标签（只改本地）
 npm run dev      本地预览
 npm run publish  验证并发布
 ```
@@ -230,6 +231,29 @@ git push origin main
 
 ---
 
+## 删除
+
+```bash
+npm run remove
+```
+
+交互式选择要删除的 **Writing / Project / Tag**。删除是破坏性的，所以这个命令刻意设计得很谨慎：
+
+- 目标只能从发现到的内容里选，不能手输路径。
+- 删除前先显示完整摘要（标题、语言、slug、状态、路径）。已发布的内容会额外警告：下次 publish 后它的公开链接会 404。
+- 如果存在翻译版本，会问是只删当前语言还是两种语言一起删（默认保守）。
+- 最后必须**原样输入 slug** 才能删除。
+- 正在被内容引用的 Tag 会被拒绝，并列出引用它的文件；只有未使用的 Tag 才能删除。
+- `npm run remove` **只改本地**，不会 commit / push。只有 `npm run publish` 才会把删除提交并推送。
+
+删除后仍然可以通过 Git 恢复，直到你 publish：
+
+```bash
+git restore -- src/content/writing/zh/my-post
+```
+
+---
+
 ## 定制
 
 - `src/site.ts` — 博客名称、作者、GitHub、所在地、首页 Currently。
@@ -328,10 +352,11 @@ npm install
 npm run dev
 ```
 
-Day to day there are just three commands:
+Day to day there are just four commands:
 
 ```text
 npm run new      create content
+npm run remove   remove content / a tag (local only)
 npm run dev      preview locally
 npm run publish  verify and publish
 ```
@@ -472,6 +497,27 @@ npm run verify
 git add src/content
 git commit -m "Publish: ..."
 git push origin main
+```
+
+## Remove
+
+```bash
+npm run remove
+```
+
+Interactively choose a **Writing / Project / Tag** to delete. Deletion is destructive, so the command is deliberately cautious:
+
+- The target must be chosen from discovered content — you never type a path.
+- It shows a full summary first (title, language, slug, status, path). Published content gets an extra warning that its public URL will 404 after the next publish.
+- If a translation exists it asks whether to remove one or both languages (conservative by default).
+- The last step requires typing the exact slug.
+- A tag that is still referenced by content is refused, with the list of files using it; only unused tags can be removed.
+- `npm run remove` only changes local files — it never commits or pushes. Only `npm run publish` commits and pushes the removal.
+
+The removal stays recoverable through Git until you publish:
+
+```bash
+git restore -- src/content/writing/zh/my-post
 ```
 
 ## Customize
