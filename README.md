@@ -224,7 +224,7 @@ push 之后 GitHub Actions 会执行同一套 `verify`，通过后才部署到 G
 
 ```bash
 npm run verify
-git add src/content
+git add src/content src/lib/tags.ts
 git commit -m "Publish: ..."
 git push origin main
 ```
@@ -494,7 +494,7 @@ Pushing to `main` runs the same `verify` in GitHub Actions; the site is deployed
 
 ```bash
 npm run verify
-git add src/content
+git add src/content src/lib/tags.ts
 git commit -m "Publish: ..."
 git push origin main
 ```
