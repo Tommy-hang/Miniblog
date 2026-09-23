@@ -224,6 +224,7 @@ Search、Pagination、客户端 filter、Category、Topic、Series、Related pos
 npm run new               交互式创建 Writing / Project / Translation
 npm run validate:content  跨内容完整性检查（只读）
 npm run verify            发布前统一检查：validate → check → build
+npm run publish           作者发布：draft 确认 → verify → 只 stage src/content/** → commit → push
 ```
 
 ## 不做

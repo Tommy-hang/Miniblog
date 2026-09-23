@@ -34,6 +34,14 @@ npm install
 npm run dev
 ```
 
+日常只需要记住三个命令：
+
+```text
+npm run new      创建内容
+npm run dev      本地预览
+npm run publish  验证并发布
+```
+
 创建第一篇文章：
 
 ```bash
@@ -176,25 +184,42 @@ npm run build              静态构建
 
 ## 发布
 
-把 `draft: false`，然后：
+写完、并在 `npm run dev` 里看过效果之后：
 
 ```bash
-npm run verify
-git add .
-git commit -m "Publish: ..."
-git push
+npm run publish
 ```
 
-push 到 `main` 后，GitHub Actions 会执行同一套 `verify`，通过后才部署到 GitHub Pages；任何一步失败都不会部署。
+它会依次：
+
+1. 检查 Git 状态（必须在 `main`，且没有已经 staged 的文件）。
+2. 确认这次改动**只涉及 `src/content/`**，否则拒绝发布。
+3. 检查 draft：如果是草稿，会先问你；确认后才会把 `draft: true` 改成 `draft: false`。
+4. 显示即将发布的内容。
+5. 运行 `npm run verify`（validate:content → check → build）。
+6. 最后确认一次。
+7. 只 stage `src/content/**`，自动生成 commit message，commit 并 push 到 `main`。
+
+push 之后 GitHub Actions 会执行同一套 `verify`，通过后才部署到 GitHub Pages；任何一步失败都不会部署。
 
 发布前清单：
 
 ```text
-1. draft: false
-2. description 已填写
-3. tags 合法
-4. npm run verify 通过
-5. commit / push
+1. description 已填写
+2. tags 合法
+3. npm run verify 通过（publish 会自动运行）
+4. npm run publish
+```
+
+### 手动发布
+
+`npm run publish` 只是对底层流程的包装，高级用户仍然可以手动：
+
+```bash
+npm run verify
+git add src/content
+git commit -m "Publish: ..."
+git push origin main
 ```
 
 ---
@@ -291,6 +316,14 @@ git clone https://github.com/Tommy-hang/Miniblog.git
 cd Miniblog
 npm install
 npm run dev
+```
+
+Day to day there are just three commands:
+
+```text
+npm run new      create content
+npm run dev      preview locally
+npm run publish  verify and publish
 ```
 
 Create your first article with `npm run new`.
@@ -395,16 +428,34 @@ npm run build              static build
 
 ## Publish
 
-Set `draft: false`, then:
+Once you have written the piece and checked it with `npm run dev`:
+
+```bash
+npm run publish
+```
+
+It then:
+
+1. Checks the Git state (must be on `main`, with nothing already staged).
+2. Confirms the changes touch **only `src/content/`** — otherwise it refuses.
+3. Checks for drafts: if a piece is still a draft it asks first, and only then flips `draft: true` to `draft: false`.
+4. Shows what is about to be published.
+5. Runs `npm run verify` (validate:content → check → build).
+6. Asks for a final confirmation.
+7. Stages only `src/content/**`, generates the commit message, commits and pushes to `main`.
+
+Pushing to `main` runs the same `verify` in GitHub Actions; the site is deployed only if it passes.
+
+### Manual publishing
+
+`npm run publish` is only a wrapper around the underlying flow, so advanced users can still do it by hand:
 
 ```bash
 npm run verify
-git add .
+git add src/content
 git commit -m "Publish: ..."
-git push
+git push origin main
 ```
-
-Pushing to `main` runs the same `verify` in GitHub Actions; the site is deployed only if it passes.
 
 ## Customize
 

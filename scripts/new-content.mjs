@@ -10,8 +10,6 @@
  * prompts work both on a real terminal and with piped input.
  */
 
-import { createInterface } from "node:readline";
-import { stdin, stdout } from "node:process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import {
@@ -19,6 +17,7 @@ import {
   LOCALES,
   contentDir,
   contentFile,
+  createPrompter,
   formatTags,
   isValidSlug,
   listContent,
@@ -29,34 +28,7 @@ import {
   today,
 } from "./content-utils.mjs";
 
-const rl = createInterface({ input: stdin, output: stdout, terminal: false });
-const queue = [];
-const waiters = [];
-let closed = false;
-
-rl.on("line", (line) => {
-  const waiter = waiters.shift();
-  if (waiter) waiter(line);
-  else queue.push(line);
-});
-rl.on("close", () => {
-  closed = true;
-  let waiter;
-  while ((waiter = waiters.shift())) waiter(null);
-});
-
-function nextLine() {
-  if (queue.length > 0) return Promise.resolve(queue.shift());
-  if (closed) return Promise.resolve(null);
-  return new Promise((resolve) => waiters.push(resolve));
-}
-
-async function ask(question) {
-  stdout.write(question);
-  const line = await nextLine();
-  if (line === null) throw new Error("Input ended before the prompt was answered.");
-  return line.trim();
-}
+const { ask, close } = createPrompter();
 
 async function choose(question, options) {
   console.log(`\n${question}`);
@@ -229,4 +201,4 @@ main()
     console.error(error.message);
     process.exitCode = 1;
   })
-  .finally(() => rl.close());
+  .finally(() => close());

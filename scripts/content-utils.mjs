@@ -10,6 +10,8 @@
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { createInterface } from "node:readline";
+import { stdin, stdout } from "node:process";
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 export const CONTENT_DIR = join(ROOT, "src", "content");
@@ -158,3 +160,55 @@ export function formatTags(tags) {
 export function relativeFromRoot(file) {
   return file.slice(ROOT.length + 1).replaceAll("\\", "/");
 }
+
+/**
+ * A tiny line-oriented prompt helper.
+ *
+ * Reads through a queue rather than `readline.question`, so the prompts work
+ * on a real terminal and with piped input alike. `confirm` defaults to the
+ * safe answer and only accepts an explicit y/n.
+ */
+export function createPrompter() {
+  const rl = createInterface({ input: stdin, output: stdout, terminal: false });
+  const queue = [];
+  const waiters = [];
+  let closed = false;
+
+  rl.on("line", (line) => {
+    const waiter = waiters.shift();
+    if (waiter) waiter(line);
+    else queue.push(line);
+  });
+  rl.on("close", () => {
+    closed = true;
+    let waiter;
+    while ((waiter = waiters.shift())) waiter(null);
+  });
+
+  function nextLine() {
+    if (queue.length > 0) return Promise.resolve(queue.shift());
+    if (closed) return Promise.resolve(null);
+    return new Promise((resolve) => waiters.push(resolve));
+  }
+
+  async function ask(question) {
+    stdout.write(question);
+    const line = await nextLine();
+    if (line === null) throw new Error("Input ended before the prompt was answered.");
+    return line.trim();
+  }
+
+  async function confirm(question, defaultValue = true) {
+    const suffix = defaultValue ? " [Y/n] " : " [y/N] ";
+    for (;;) {
+      const answer = (await ask(question + suffix)).toLowerCase();
+      if (answer === "") return defaultValue;
+      if (answer === "y" || answer === "yes") return true;
+      if (answer === "n" || answer === "no") return false;
+      stdout.write("Please answer y or n.\n");
+    }
+  }
+
+  return { ask, confirm, close: () => rl.close() };
+}
+
