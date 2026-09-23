@@ -20,11 +20,48 @@ const navItems = [
   <a class="wordmark" href={base} aria-label={`${site.name}, home`}>
     {site.name}<span aria-hidden="true">*</span>
   </a>
-  <nav aria-label="Primary navigation">
-    {navItems.map((item) => (
-      <a href={item.href} aria-current={pathname.includes(item.match) ? "page" : undefined}>
-        {item.label}
-      </a>
-    ))}
-  </nav>
+  <div class="site-header-end">
+    <nav aria-label="Primary navigation">
+      {navItems.map((item) => (
+        <a href={item.href} aria-current={pathname.includes(item.match) ? "page" : undefined}>
+          {item.label}
+        </a>
+      ))}
+    </nav>
+    {/* Shows the mode you will switch to. Default follows the system; a click
+        pins the choice. The pre-paint script in BaseLayout applies it early. */}
+    <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark theme">
+      <span data-theme-label>Dark</span>
+    </button>
+  </div>
 </header>
+
+<script is:inline>
+  (() => {
+    const init = () => {
+      const root = document.documentElement;
+      const button = document.querySelector("[data-theme-toggle]");
+      const label = button && button.querySelector("[data-theme-label]");
+      if (!button || !label) return;
+      const media = window.matchMedia("(prefers-color-scheme: dark)");
+      const current = () => root.dataset.theme || (media.matches ? "dark" : "light");
+      const render = () => {
+        const dark = current() === "dark";
+        label.textContent = dark ? "Light" : "Dark";
+        button.setAttribute("aria-label", dark ? "Switch to light theme" : "Switch to dark theme");
+      };
+      button.addEventListener("click", () => {
+        const next = current() === "dark" ? "light" : "dark";
+        root.dataset.theme = next;
+        try {
+          window.localStorage.setItem("theme", next);
+        } catch (_) {}
+        render();
+      });
+      media.addEventListener("change", render);
+      render();
+    };
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+    else init();
+  })();
+</script>

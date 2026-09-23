@@ -8,15 +8,25 @@
 /* 1. Tokens */
 :root {
   color-scheme: light dark;
+  /* Light values are the fallback; light-dark() resolves against color-scheme. */
   --color-background: #f3f0e9;
+  --color-background: light-dark(#f3f0e9, #171714);
   --color-surface: #e9e4da;
+  --color-surface: light-dark(#e9e4da, #22221e);
   --color-code: #e7e1d3;
+  --color-code: light-dark(#e7e1d3, #201f1b);
   --color-text: #1d1d1a;
+  --color-text: light-dark(#1d1d1a, #eeeae1);
   --color-text-secondary: #5f5d57;
+  --color-text-secondary: light-dark(#5f5d57, #aaa79f);
   --color-text-tertiary: #89867e;
+  --color-text-tertiary: light-dark(#89867e, #77756f);
   --color-border: #c9c4b9;
+  --color-border: light-dark(#c9c4b9, #3b3a35);
   --color-accent: #d84a32;
+  --color-accent: light-dark(#d84a32, #f06a4e);
   --color-selection: #f0a493;
+  --color-selection: light-dark(#f0a493, #793829);
   /*
    * No web font is shipped. The first entry is a real system family rather
    * than a phantom "Inter" that never loads, so the declared stack is honest
@@ -43,19 +53,10 @@
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-background: #171714;
-    --color-surface: #22221e;
-    --color-code: #201f1b;
-    --color-text: #eeeae1;
-    --color-text-secondary: #aaa79f;
-    --color-text-tertiary: #77756f;
-    --color-border: #3b3a35;
-    --color-accent: #f06a4e;
-    --color-selection: #793829;
-  }
-}
+/* A manual choice overrides the system default. `data-theme` is set before
+ * paint by a tiny inline script in <head>, and updated by the header toggle. */
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
 
 /* 2. Reset / base */
 *, *::before, *::after { box-sizing: border-box; }
@@ -147,6 +148,7 @@ main { min-height: 70vh; }
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 1rem;
   min-height: 6.5rem;
   border-bottom: 1px solid var(--color-border);
   font-size: 0.75rem;
@@ -156,6 +158,7 @@ main { min-height: 70vh; }
 }
 .site-header a { text-decoration: none; }
 .wordmark span { margin-left: 0.18em; color: var(--color-accent); }
+.site-header-end { display: flex; align-items: center; gap: clamp(1.25rem, 3vw, 3rem); }
 .site-header nav { display: flex; gap: clamp(1.25rem, 3vw, 3rem); }
 .site-header nav a { position: relative; color: var(--color-text-secondary); }
 .site-header nav a::after {
@@ -168,6 +171,29 @@ main { min-height: 70vh; }
 }
 .site-header nav a:hover, .site-header nav a[aria-current="page"] { color: var(--color-text); }
 .site-header nav a:hover::after, .site-header nav a[aria-current="page"]::after { inset-inline-end: 0; }
+
+/* Theme toggle — a quiet text control, typed exactly like the navigation.
+ * It shows the mode you will switch to, so it reads as an action. */
+.theme-toggle {
+  position: relative;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  transition: color 180ms ease;
+}
+.theme-toggle::after {
+  position: absolute;
+  inset: auto 100% -0.45rem 0;
+  height: 1px;
+  background: var(--color-accent);
+  content: "";
+  transition: inset-inline-end 220ms var(--ease);
+}
+.theme-toggle:hover, .theme-toggle:focus-visible { color: var(--color-accent); }
+.theme-toggle:hover::after, .theme-toggle:focus-visible::after { inset-inline-end: 0; }
+
 a:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 5px; }
 
 /* 6. Home and components */
@@ -430,4 +456,37 @@ a:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 5px; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+}
+
+/* 12. Archive masthead — the Writing and Projects titles are centered and
+ * span the full row. Kept last so they win over the generic .page-header rules
+ * at every width. */
+.page-header--display { display: grid; align-items: center; container-type: inline-size; }
+.page-header--display .index-label { grid-column: 1 / 13; grid-row: 1; align-self: end; justify-self: center; }
+.page-header--display h1 {
+  grid-column: 1 / 13;
+  grid-row: 2;
+  margin: var(--space-5) 0 0;
+  text-align: center;
+  /* cqw scales with the row itself, not the viewport, so the title fills the
+   * line at every width and stops growing once the shell reaches its cap. */
+  font-size: clamp(2.5rem, 28cqw, 27rem);
+  line-height: 1;
+  letter-spacing: -0.05em;
+  /* A tight display line lets the descender overflow its box by ~0.15em;
+   * this em-based padding keeps it clear of the description at any size. */
+  padding-block-end: 0.2em;
+}
+.page-header--display > p:last-child {
+  grid-column: 1 / 13;
+  grid-row: 3;
+  justify-self: center;
+  max-width: 44rem;
+  margin: var(--space-5) 0 0;
+  text-align: center;
+}
+@media (max-width: 38rem) {
+  .site-header { font-size: 0.68rem; letter-spacing: 0.08em; gap: 0.7rem; }
+  .site-header-end { gap: 0.9rem; }
+  .site-header nav { gap: 0.9rem; }
 }

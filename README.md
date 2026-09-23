@@ -238,6 +238,10 @@ git push origin main
 - `src/styles/prose.css` — Editorial Prose System（文章阅读与 Markdown 排版）。
 - `public/favicon.svg` / `public/social-card.svg` — 品牌资产。
 
+### 亮/暗模式
+
+Header 右侧有一个安静的亮/暗切换：**默认跟随系统**（`prefers-color-scheme`），手动点一下会覆盖并记住选择。它是一段约十行的内联脚本 + 现代 CSS `light-dark()`，没有依赖、没有框架。两种模式在移动端和桌面端都已设计。
+
 ## 项目结构
 
 ```text
@@ -474,6 +478,10 @@ git push origin main
 - `src/i18n/ui.ts` — the few strings that follow the content language.
 - `src/styles/global.css` — design tokens and site chrome.
 - `src/styles/prose.css` — the Editorial Prose System.
+
+### Light / dark mode
+
+The header carries a quiet light/dark toggle. It **follows the system** (`prefers-color-scheme`) by default; clicking it pins a manual choice that is remembered. It is a ~10-line inline script plus modern CSS `light-dark()` — no dependency, no framework. Both modes are designed for mobile and desktop.
 
 ## Deploy
 

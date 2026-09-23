@@ -1826,6 +1826,10 @@ Core 第一版：
 
 ---
 
+> **V1.5.3 已实现。** Header 右侧一个安静的文字切换（显示将要切换到的模式），默认跟随 `prefers-color-scheme`，手动选择写入 `localStorage` 并在绘制前由一小段内联脚本应用（无闪烁）。样式上只用 `data-theme` + 现代 CSS `light-dark()` 切换 `color-scheme`，不复制整套 token，也没有引入依赖。原则仍是：一个很小的控制，克制、可解释。
+
+---
+
 # 64. Selection
 
 请设计：

@@ -45,6 +45,15 @@ const ogLocale = locale === "zh" ? "zh_CN" : "en_US";
     <meta name="description" content={description} />
     <meta name="theme-color" content="#f3f0e9" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#171714" media="(prefers-color-scheme: dark)" />
+    {/* Apply a saved theme before paint, so a manual choice never flashes. */}
+    <script is:inline>
+      (() => {
+        try {
+          const theme = window.localStorage.getItem("theme");
+          if (theme === "light" || theme === "dark") document.documentElement.dataset.theme = theme;
+        } catch (_) {}
+      })();
+    </script>
     <link rel="canonical" href={canonical} />
     <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
     <link rel="alternate" type="application/rss+xml" title={`${site.name} — 中文`} href={`${base}rss.xml`} />
