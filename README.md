@@ -39,6 +39,7 @@ npm run dev
 ```text
 npm run new      创建内容
 npm run remove   删除内容 / 标签（只改本地）
+npm run feature  管理首页精选（只改本地）
 npm run dev      本地预览
 npm run publish  验证并发布
 ```
@@ -254,6 +255,16 @@ git restore -- src/content/writing/zh/my-post
 
 ---
 
+## 精选
+
+```bash
+npm run feature
+```
+
+管理首页的 **Selected Writing / Selected Projects**：添加、移除或替换，中英文按 entry 独立管理。`featured` frontmatter 是唯一真源，首页不再有任何"没有精选就显示最新"的回退；每个 collection 最多 3 个，只有 `draft: false` 的内容可以入选。和 `npm run remove` 一样，它只改本地 Markdown，不 commit / push。
+
+---
+
 ## 定制
 
 - `src/site.ts` — 博客名称、作者、GitHub、所在地、首页 Currently。
@@ -357,6 +368,7 @@ Day to day there are just four commands:
 ```text
 npm run new      create content
 npm run remove   remove content / a tag (local only)
+npm run feature  curate homepage selections (local only)
 npm run dev      preview locally
 npm run publish  verify and publish
 ```
@@ -519,6 +531,14 @@ The removal stays recoverable through Git until you publish:
 ```bash
 git restore -- src/content/writing/zh/my-post
 ```
+
+## Feature
+
+```bash
+npm run feature
+```
+
+Add, remove, or replace **Selected Writing and Selected Projects** on the homepage; each language version is managed independently. `featured` frontmatter is the single source of truth, there is no "fall back to latest" rule, and each collection shows at most three published entries. Like `npm run remove`, it only edits local Markdown — nothing is committed or pushed.
 
 ## Customize
 

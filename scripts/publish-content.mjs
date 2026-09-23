@@ -11,12 +11,13 @@
  */
 
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import {
   ROOT,
   createPrompter,
   listContent,
   parseFrontmatter,
+  setFrontmatterBoolean,
 } from "./content-utils.mjs";
 
 /** Author Workflow may only publish content and the controlled tag registry. */
@@ -60,12 +61,7 @@ function unitFromPath(file) {
 
 function setDraftFalse(file) {
   if (!file || !existsSync(file)) return;
-  const raw = readFileSync(file, "utf8");
-  const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---/);
-  if (!match || !/^draft:\s*true\s*$/m.test(match[1])) return;
-  const block = match[1].replace(/^draft:\s*true\s*$/m, "draft: false");
-  const updated = raw.slice(0, match.index) + match[0].replace(match[1], block) + raw.slice(match.index + match[0].length);
-  writeFileSync(file, updated, "utf8");
+  setFrontmatterBoolean(file, "draft", false);
 }
 
 function commitMessage(items, tagsChanged) {

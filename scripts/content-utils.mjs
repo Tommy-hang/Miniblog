@@ -94,6 +94,37 @@ export function removeTag(slug) {
   writeFileSync(TAGS_FILE, updated, "utf8");
 }
 
+/**
+ * Sets one boolean frontmatter field, changing nothing else.
+ *
+ * If the key exists its value is replaced in place, so existing formatting and
+ * field order stay stable. If the key is missing it is appended as the last
+ * line of the frontmatter block. The body and every other field are untouched;
+ * the rest of the file is copied through byte for byte.
+ */
+export function setFrontmatterBoolean(file, key, value) {
+  const raw = readFileSync(file, "utf8");
+  const match = raw.match(/^---(\r?\n)([\s\S]*?)\r?\n---/);
+  if (!match) {
+    throw new Error(`No frontmatter block found in ${relativeFromRoot(file)}.`);
+  }
+
+  const [full, newline, block] = match;
+  const literal = `${key}: ${value === true}`;
+  const linePattern = new RegExp(`^[ \\t]*${key}:[ \\t]*(?:true|false)[ \\t]*$`, "m");
+  const updatedBlock = linePattern.test(block)
+    ? block.replace(linePattern, literal)
+    : block.length > 0
+      ? `${block}${newline}${literal}`
+      : literal;
+
+  const frontmatter = `---${newline}${updatedBlock}${newline}---`;
+  const updated = raw.slice(0, match.index) + frontmatter + raw.slice(match.index + full.length);
+  if (updated === raw) return false;
+  writeFileSync(file, updated, "utf8");
+  return true;
+}
+
 /** "Understanding Attention" → "understanding-attention"; non-ASCII → "". */
 export function slugify(title) {
   if (/[^\x00-\x7F]/.test(title)) return "";

@@ -67,10 +67,13 @@ export async function publishedProjects(locale: Locale): Promise<ProjectEntry[]>
   return entries.sort(byDateDesc);
 }
 
-/** Homepage picks featured first, newest first; falls back to latest when nothing is featured. */
-export function featuredOrLatest<T extends ContentEntry>(entries: T[], limit: number): T[] {
-  const featured = entries.filter((entry) => entry.data.featured);
-  return (featured.length > 0 ? featured : entries).slice(0, limit);
+/**
+ * Homepage curation: only entries the author explicitly marked `featured: true`
+ * appear, in their existing (newest-first) order. There is deliberately no
+ * "fall back to latest" rule — Selected means selected.
+ */
+export function featuredEntries<T extends ContentEntry>(entries: T[], limit: number): T[] {
+  return entries.filter((entry) => entry.data.featured).slice(0, limit);
 }
 
 /** Returns the published same-slug entry in the other locale, if it exists. */

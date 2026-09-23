@@ -44,6 +44,7 @@ const counts = {
   writing: { published: 0, draft: 0 },
   projects: { published: 0, draft: 0 },
 };
+const featuredPublished = { writing: 0, projects: 0 };
 const tagsInUse = new Set();
 const byCollectionSlug = new Map();
 
@@ -59,6 +60,7 @@ for (const entry of entries) {
   const updated = typeof data.updated === "string" ? data.updated : "";
 
   counts[entry.collection][draft ? "draft" : "published"] += 1;
+  if (!draft && featured) featuredPublished[entry.collection] += 1;
   if (Array.isArray(data.tags)) for (const tag of data.tags) tagsInUse.add(tag);
 
   const key = `${entry.collection}/${entry.slug}`;
@@ -92,6 +94,16 @@ for (const entry of entries) {
 const translationPairs = [...byCollectionSlug.values()].filter(
   (locales) => locales.has("zh") && locales.has("en"),
 ).length;
+
+// --- Homepage curation limit ------------------------------------------------
+const HOMEPAGE_LIMIT = 3;
+for (const collection of ["writing", "projects"]) {
+  if (featuredPublished[collection] > HOMEPAGE_LIMIT) {
+    errors.push(
+      `${collection}: ${featuredPublished[collection]} published items are marked featured, but the homepage limit is ${HOMEPAGE_LIMIT}`,
+    );
+  }
+}
 
 // --- Report -----------------------------------------------------------------
 const pad = (label, width = 18) => label.padEnd(width);
