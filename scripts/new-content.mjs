@@ -23,12 +23,14 @@ import {
   listContent,
   parseFrontmatter,
   readTagRegistry,
+  registerTag,
   relativeFromRoot,
   slugify,
   today,
+  validateTagName,
 } from "./content-utils.mjs";
 
-const { ask, close } = createPrompter();
+const { ask, confirm, close } = createPrompter();
 
 async function choose(question, options) {
   console.log(`\n${question}`);
@@ -65,18 +67,75 @@ async function askSlug(suggested) {
   }
 }
 
-async function askTags() {
-  const allowed = readTagRegistry().map((tag) => tag.name);
+/** Ask for a slug for a brand-new tag, rejecting invalid or duplicate slugs. */
+async function askTagSlug(name, findBySlug) {
+  const suggested = slugify(name);
   for (;;) {
-    const answer = await ask(`Tags (comma separated, optional)\n  allowed: ${allowed.join(", ")}\n> `);
-    if (!answer) return [];
-    const tags = answer.split(",").map((tag) => tag.trim()).filter(Boolean);
-    const unknown = tags.filter((tag) => !allowed.includes(tag));
-    if (unknown.length > 0) {
-      console.log(`Unknown tag(s): ${unknown.join(", ")}. Register them in src/lib/tags.ts first.`);
+    const answer = await ask(`Slug${suggested ? ` [${suggested}]` : ""}: `);
+    const slug = answer || suggested;
+    if (!slug) {
+      console.log("A slug is required. Use lowercase ASCII, e.g. machine-learning.");
       continue;
     }
-    return [...new Set(tags)];
+    if (!isValidSlug(slug)) {
+      console.log(`"${slug}" is not valid. Use lowercase letters, numbers and single hyphens.`);
+      continue;
+    }
+    const owner = findBySlug(slug);
+    if (owner) {
+      console.log(`Slug "${slug}" is already used by "${owner.name}".`);
+      continue;
+    }
+    return slug;
+  }
+}
+
+/**
+ * Resolves a comma-separated tag input against the registry. Unknown tags are
+ * offered for registration one at a time (default: no); declining restarts the
+ * prompt. Returns the accepted canonical names plus any tags still to register.
+ */
+async function askTags() {
+  const registry = readTagRegistry();
+  const pending = [];
+  const known = () => [...registry, ...pending];
+  const findByName = (name) => known().find((tag) => tag.name.toLowerCase() === name.toLowerCase());
+  const findBySlug = (slug) => known().find((tag) => tag.slug === slug);
+
+  for (;;) {
+    const answer = await ask(`Tags (comma separated, optional)\n  allowed: ${known().map((tag) => tag.name).join(", ")}\n> `);
+    if (!answer) return { tags: [], pending };
+
+    const names = [...new Set(answer.split(",").map((tag) => tag.trim()).filter(Boolean))];
+    const before = pending.length;
+    const accepted = [];
+    let declined = false;
+
+    for (const name of names) {
+      const existing = findByName(name);
+      if (existing) {
+        accepted.push(existing.name);
+        continue;
+      }
+
+      console.log(`\n"${name}" is not registered.`);
+      const create = await confirm(`\nCreate this tag?\n\n  ${name} → ${slugify(name) || "?"}`, false);
+      if (!create) {
+        declined = true;
+        break;
+      }
+      const slug = await askTagSlug(name, findBySlug);
+      pending.push({ name, slug });
+      accepted.push(name);
+    }
+
+    if (declined) {
+      pending.length = before;
+      console.log(`\nTag not created.\n\nPlease enter registered tags again.\n\nAvailable:\n  ${known().map((tag) => tag.name).join(", ")}`);
+      continue;
+    }
+
+    return { tags: [...new Set(accepted)], pending };
   }
 }
 
@@ -101,11 +160,17 @@ async function createContent(collection) {
   const locale = await choose("Language:", LOCALES.map((value) => ({ label: value, value })));
   const title = await askTitle();
   const slug = await askSlug(slugify(title));
-  const tags = await askTags();
+  const { tags, pending } = await askTags();
 
   const dir = contentDir(collection, locale, slug);
   if (existsSync(dir) || existsSync(join(CONTENT_DIR, collection, locale, `${slug}.md`))) {
     return refuse(dir);
+  }
+
+  // Every condition is validated: register new tags, then write the content.
+  for (const tag of pending) registerTag(tag.name, tag.slug);
+  if (pending.length > 0) {
+    console.log(`\nRegistered:\n${pending.map((tag) => `  ${tag.name} → ${tag.slug}`).join("\n")}`);
   }
 
   const date = today();
@@ -119,6 +184,39 @@ async function createContent(collection) {
 
   console.log(`\nCreated:\n  ${relativeFromRoot(file)}`);
   nextSteps("Write the description", "Add the content");
+}
+
+async function createTag() {
+  const registry = readTagRegistry();
+  const findBySlug = (slug) => registry.find((tag) => tag.slug === slug);
+
+  for (;;) {
+    const raw = await ask("\nTag name: ");
+    const problem = validateTagName(raw);
+    if (problem) {
+      console.log(problem);
+      continue;
+    }
+
+    const name = raw.trim();
+    const existing = registry.find((tag) => tag.name.toLowerCase() === name.toLowerCase());
+    if (existing) {
+      console.log(`\nTag already exists:\n\n  ${existing.name} → ${existing.slug}`);
+      return;
+    }
+
+    const slug = await askTagSlug(name, findBySlug);
+    const confirmed = await confirm(`\nCreate tag?\n\n  ${name} → ${slug}`, false);
+    if (!confirmed) {
+      console.log("\nTag not created.");
+      return;
+    }
+
+    registerTag(name, slug);
+    console.log(`\nCreated tag:\n\n  ${name} → ${slug}`);
+    console.log(`\nAvailable tags:\n${readTagRegistry().map((tag) => `  ${tag.name}`).join("\n")}`);
+    return;
+  }
 }
 
 async function createTranslation() {
@@ -186,8 +284,10 @@ async function main() {
     { label: "Writing", value: "writing" },
     { label: "Project", value: "projects" },
     { label: "Translation of existing content", value: "translation" },
+    { label: "Tag", value: "tag" },
   ]);
   if (action === "translation") await createTranslation();
+  else if (action === "tag") await createTag();
   else await createContent(action);
 }
 

@@ -7,7 +7,7 @@
  * frontmatter subset MiniBlog actually uses.
  */
 
-import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createInterface } from "node:readline";
@@ -32,6 +32,44 @@ export function readTagRegistry() {
     throw new Error(`Could not read any tags from ${TAGS_FILE}.`);
   }
   return matches.map(([, name, slug]) => ({ name, slug }));
+}
+
+/** Returns a problem description, or null when the tag name is usable. */
+export function validateTagName(name) {
+  const trimmed = name.trim();
+  if (!trimmed) return "Tag name cannot be empty.";
+  if (/[\u0000-\u001f"\\]/.test(trimmed)) {
+    return "Tag name cannot contain control characters, quotes or backslashes.";
+  }
+  return null;
+}
+
+const TAGS_ARRAY_START = "export const tags = [";
+const TAGS_ARRAY_END = "] as const satisfies readonly { name: string; slug: string }[];";
+
+/**
+ * Appends one entry to `src/lib/tags.ts`, the single tag registry.
+ *
+ * It anchors on the array declaration and its closing type annotation, reuses
+ * the existing indentation, and never rewrites the rest of the file. If that
+ * shape cannot be found it refuses rather than guessing.
+ */
+export function registerTag(name, slug) {
+  const source = readFileSync(TAGS_FILE, "utf8");
+  const start = source.indexOf(TAGS_ARRAY_START);
+  const end = source.indexOf(TAGS_ARRAY_END);
+  if (start === -1 || end === -1 || end < start) {
+    throw new Error("Could not safely update src/lib/tags.ts. No changes were made.");
+  }
+
+  const bodyStart = start + TAGS_ARRAY_START.length;
+  const body = source.slice(bodyStart, end);
+  const indentMatch = body.match(/\n([ \t]*)\{ name:/);
+  const indent = indentMatch ? indentMatch[1] : "  ";
+  const entry = `{ name: ${JSON.stringify(name)}, slug: ${JSON.stringify(slug)} },`;
+  const trimmed = body.replace(/\s+$/, "");
+  const updated = source.slice(0, bodyStart) + `${trimmed}\n${indent}${entry}\n` + source.slice(end);
+  writeFileSync(TAGS_FILE, updated, "utf8");
 }
 
 /** "Understanding Attention" → "understanding-attention"; non-ASCII → "". */

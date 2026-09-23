@@ -59,9 +59,11 @@ What do you want to create?
   1. Writing
   2. Project
   3. Translation of existing content
+  4. Tag
 ```
 
 - **Writing / Project**：选择语言（zh / en）→ 输入标题 → 确认 slug → 选择标签。
+- **Tag**：单独注册一个新标签（见「标签」）。
 - **slug**：小写 ASCII、kebab-case，例如 `understanding-attention`。中文标题不会自动转拼音，请手动输入一个稳定的英文 slug。
 - **tags**：可选，只能使用 `src/lib/tags.ts` 中注册过的标签（见「标签」）。
 - **新内容默认 `draft: true`**：创建不等于发布。
@@ -143,7 +145,10 @@ npm run new
 标签是内容发现的第二轴，也是**受控词表**：
 
 - 只能使用 `src/lib/tags.ts` 中注册的名字。写错（例如 `Contorl`）会在 `npm run check` / `npm run build` 阶段直接失败，不会生成 `/tags/contorl/`。
-- 新增标签：在 `src/lib/tags.ts` 里加一行 `{ name: "Control", slug: "control" }`。
+- 注册新标签有两种方式：
+  - `npm run new` → `4. Tag`；或在创建 Writing / Project 时直接输入一个未注册的标签。脚本会先询问是否注册（**默认 No**），确认后才写入 `src/lib/tags.ts`。
+  - 或者手动在 `src/lib/tags.ts` 里加一行 `{ name: "Control", slug: "control" }`。
+- 新标签必须显式确认，并且仍然是受控词表——让创建分类变简单，但不要让它变随意。
 - 一篇内容通常 1–3 个标签；标签是主题导航，不是 SEO 关键词。
 - 标签跨 Writing / Projects；`/tags/<slug>/` 会自动生成，只对真正有内容的标签生成。
 
@@ -337,9 +342,11 @@ What do you want to create?
   1. Writing
   2. Project
   3. Translation of existing content
+  4. Tag
 ```
 
 - **Writing / Project**: choose a language (zh / en) → title → slug → optional tags.
+- **Tag**: register a single new tag (see "Tags").
 - **Slug**: lowercase ASCII kebab-case, e.g. `understanding-attention`. Chinese titles are not transliterated; supply a stable English slug.
 - **Tags**: optional, and limited to the names registered in `src/lib/tags.ts`.
 - **New content starts as `draft: true`** — creating is not publishing.
@@ -391,7 +398,10 @@ Only a **published** translation shows a language link on the article page. Sing
 Tags are the second discovery axis and a **controlled vocabulary**:
 
 - Only names registered in `src/lib/tags.ts` are allowed. A typo fails `npm run check` / `npm run build` instead of creating `/tags/contorl/`.
-- Add a tag by adding one line: `{ name: "Control", slug: "control" }`.
+- There are two ways to register a tag:
+  - `npm run new` → `4. Tag`, or type an unregistered tag while creating Writing / Project. The script asks first (**default No**) and only then writes it to `src/lib/tags.ts`.
+  - Or add one line by hand: `{ name: "Control", slug: "control" }`.
+- New tags always require explicit confirmation and remain part of the controlled vocabulary — easy to create, never accidental.
 - Use 1–3 tags per piece; tags navigate topics, they are not SEO keywords.
 - Tags cross Writing and Projects; `/tags/<slug>/` is generated only for tags that have content.
 

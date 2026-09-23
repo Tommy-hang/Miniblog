@@ -186,6 +186,7 @@ Tag   →  第二轴（主题 / 兴趣）
 - **时间来自真实数据**。年 / 月分组由 frontmatter `date` 生成，不手写。排序 `date DESC`，并以 title / id 做稳定的次级排序，避免 build 顺序造成随机。
 - **Archive 忽略 featured**。featured 只影响首页；Archive 永远以真实时间为主，`updated` 不改变位置。
 - **标签是受控词表**。标签在 `src/lib/tags.ts` 注册，并由 content schema 校验；拼错在构建期直接失败，不生成错误路由。标签固定英文，跨 Writing / Projects 共享。
+- **新增 Tag 必须显式确认**。`npm run new` 可以在 `4. Tag` 或创建内容时注册未注册的 Tag，但默认是 No，确认后才写入 `src/lib/tags.ts`；`tags.ts` 仍是唯一来源，不产生第二份配置。
 - **标签是知识导航，不是 SEO 关键词**。一篇内容通常 1–3 个标签。
 - **Tag 路由统一** `/tags/<slug>/`。一个 Tag 页面可同时展示 Writing 与 Projects，分区显示，空 section 不显示。
 - **Global navigation 不变**。Header 永远只有 Writing / Projects / About；Discovery 发生在内容结构内部，不向全局导航加入口。
