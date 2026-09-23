@@ -13,6 +13,7 @@ export const tags = [
   { name: "Design", slug: "design" },
   { name: "Workflow", slug: "workflow" },
   { name: "Web", slug: "web" },
+  { name: "Aviation", slug: "aviation" },
 ] as const satisfies readonly { name: string; slug: string }[];
 
 export type Tag = (typeof tags)[number];
