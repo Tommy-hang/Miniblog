@@ -155,9 +155,11 @@
 .article-body pre.astro-code { color: var(--shiki-light); }
 .article-body pre.astro-code span { color: var(--shiki-light); }
 @media (prefers-color-scheme: dark) {
-  .article-body pre.astro-code { color: var(--shiki-dark); }
-  .article-body pre.astro-code span { color: var(--shiki-dark); }
+  :root:not([data-theme="light"]) .article-body pre.astro-code { color: var(--shiki-dark); }
+  :root:not([data-theme="light"]) .article-body pre.astro-code span { color: var(--shiki-dark); }
 }
+:root[data-theme="dark"] .article-body pre.astro-code { color: var(--shiki-dark); }
+:root[data-theme="dark"] .article-body pre.astro-code span { color: var(--shiki-dark); }
 
 /* 10. Media — default, wide, cover, caption.
  * The image decides its own boundary; `"frame"` adds a hairline when a

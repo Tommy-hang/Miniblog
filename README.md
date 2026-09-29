@@ -8,6 +8,8 @@ MiniBlog 是一个使用 Astro 构建的现代个人出版物，也是一次关�
 
 V1 系列（V1.0–V1.5）已经完成：内容架构、语言模型、文章排版、内容发现，以及一套让作者可以长期、低摩擦、低错误率使用的发布流程。
 
+**当前版本：V1.5.6。** 本次更新修复了手动切换主题时 Markdown 代码块高亮颜色仍跟随系统主题的问题；浅色与深色模式下，代码文字现在都会与对应背景保持清晰对比。
+
 ```text
 想法 → npm run new → Markdown + 图片 → npm run verify → git push → 自动部署
 ```
@@ -340,6 +342,8 @@ MiniBlog 由 **张文曜（Tommy-hang）** 创建并维护。
 MiniBlog is a modern personal publication built with Astro and a long-term experiment around one question: how little technical complexity does an excellent digital reading experience actually require? Articles are Markdown, the interface is fixed English, content can be Chinese or English, and the whole site is static with zero client-side JavaScript.
 
 The V1 series (V1.0–V1.5) is complete: content architecture, the language model, editorial typography, content discovery, and a publishing workflow that is low-friction and low-error for the author.
+
+**Current release: V1.5.6.** This release fixes Markdown code highlighting after a manual theme change. Code text now follows the selected site theme, keeping readable contrast in both light and dark modes.
 
 ```text
 idea → npm run new → Markdown + images → npm run verify → git push → deploy
